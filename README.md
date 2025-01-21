@@ -9,6 +9,7 @@ Gym Roster provides a service to maintain college gymnastics teams, athletes, st
 * Java 21+
 * Maven 3.9.x
 * Docker
+* Postgresql
 
 ### Setup
 Refer to [Development Setup](docs/development-setup.md).

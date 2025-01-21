@@ -7,6 +7,7 @@ This document provides information for a developer to get their local developmen
 * Java 21 - The programming language used to develop this service.
 * Maven 3.9.x - The build tool used for this Java service.
 * Docker
+* Postgres
 
 ## Install Homebrew
 
@@ -83,20 +84,61 @@ brew install maven
 ## Install Docker
 Docker allows for the creation, packaging and execution of a managed environments for applications. Go to the [Docker](https://docs.docker.com/get-started/get-docker/) website for information on its installation.
 
-## Archive
-You may see a message similar to below when you finish installing the JDK.
+## Install Postgres
+### 1. Download the Postgres image
+```shell
+docker pull postgres:17-alpine
 ```
-==> openjdk@21
-For the system Java wrappers to find this JDK, symlink it with
-  sudo ln -sfn /usr/local/opt/openjdk@21/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-21.jdk
 
-openjdk@21 is keg-only, which means it was not symlinked into /usr/local,
-because this is an alternate version of another formula.
-
-If you need to have openjdk@21 first in your PATH, run:
-  echo 'export PATH="/usr/local/opt/openjdk@21/bin:$PATH"' >> ~/.zshrc
-
-For compilers to find openjdk@21 you may need to set:
-  export CPPFLAGS="-I/usr/local/opt/openjdk@21/include"
+### 2. Create and start a container from the Postgres image
+```shell
+docker run --name gym-roster-postgres -p 5432:5432 -e POSTGRES_PASSWORD=gympass -d postgres:17-alpine 
 ```
-  
+Where:
+* `docker run`
+   * The docker command used to run a container based on an image.
+* `--name gym-roster-postgres`
+   * Assigns the name "gym-roster-postgres" to the container that's being created from the `run` command.
+* `-e POSTGRES_PASSWORD=gympass`
+   * The `-e` flag sets an environment variable inside the container. `POSTGRES_PASSWORD` is required by image.
+   * The Postgres server will use this password for the user account called `postgres`.
+* `-d`
+   * The `-d` flag tells docker to run the container in detached mode which means it will run in the background. 
+* `postgres:17-alpine`
+   * The image that docker will use to create the container. The image is pulled from Docker Hub if it's not already available locally. 
+
+## Access the Postgres container
+#### To view logs:
+```shell
+docker logs gym-roster-postgres
+```
+
+#### To access the container's shell:
+```shell
+docker exec -it gym-roster-postgres bash
+```
+
+#### To connect to Postgres: Inside the container, you can use the psql command to interact with the Postgres database:
+Access the container shell as shown above and then use the `psql` CLI. 
+```shell
+psql -U postgres
+```
+This will open a PostgreSQL interactive shell for the postgres user, using the `gympass` you specified earlier.
+
+#### References:
+* [How to Use the Postgres Docker Official Image](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)
+
+## Install psql (Optional)
+Homebrew's package for the PostgreSQL client tools is libpq, which includes psql, pg_dump, and other client utilities.)
+```shell
+brew install libpq
+```
+
+Finally, symlink psql (and other libpq tools) into /usr/local/bin. (Note: libpq does not install itself in the /usr/local/bin directory. Thus, you need to link them to the directory to use the installed binaries.
+```shell
+brew link --force libpq
+```
+
+#### References:
+* Instructions came from [Install psql without PostgreSQL on MacOS](https://www.linkedin.com/pulse/install-psql-without-postgresql-macos-dexter-hardy/)
+
