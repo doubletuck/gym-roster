@@ -1,15 +1,13 @@
 spring:
-  application:
-    name: springboot
-  jackson:
-    property-naming-strategy: SNAKE_CASE
-  flyway:
-    locations: classpath:/db/migration
-    schemas: gymroster
-    baselineOnMigrate: true
-    enabled: true
   datasource:
-    driverClassName: org.postgresql.Driver
-    url: jdbc:postgresql://localhost:5432/employees?currentSchema=employees
-    username: postgres
-    password: gympass
+    url: "jdbc:postgresql://localhost:5432/gymroster"
+    username: "postgres"
+    password: "gympass"
+  jpa:
+    hibernate:
+      ddl-auto: update
+logging:
+  level:
+    org:
+      springframework:
+        jdbc: "DEBUG"
