@@ -1,0 +1,7 @@
+spring:
+  datasource:
+    url: "jdbc:postgresql://localhost:5432/gymroster"
+    username: "postgres"
+    password: "gympass"
+  jpa:
+    show-sql: true
