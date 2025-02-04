@@ -139,6 +139,11 @@ Finally, symlink psql (and other libpq tools) into /usr/local/bin. (Note: libpq 
 brew link --force libpq
 ```
 
+## To connect:
+```shell
+psql -h localhost -p 5432 -U postgres
+```
+
 #### References:
 * Instructions came from [Install psql without PostgreSQL on MacOS](https://www.linkedin.com/pulse/install-psql-without-postgresql-macos-dexter-hardy/)
 
