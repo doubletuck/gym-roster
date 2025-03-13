@@ -1,4 +1,13 @@
 # Local Development Environment
+This document provide steps for setting up a development environment for developing and running this module locally.
+
+### Table of Contents
+* [Prerequisites](#prerequisites)
+* [Installing](#installing)
+* [Building](#building)
+* [Configuring](#configuring)
+* [Running](#running)
+* [Accessing the database](#accessing-the-database)
 
 ## Prerequisites
 
@@ -37,6 +46,7 @@ To run the Docker image, you will need to provide values for the following envir
 | DB_USERNAME           | postgres                                   |
 | DB_PASSWORD           | gympass                                    |
 | SPRING_PROFILE_ACTIVE | local                                      |
+
 
 The `local` profile defaults to the aforementioned values. If running the application in a different, then the environment variables will need to be provided.
 
@@ -86,3 +96,29 @@ To ping, go to http://127.0.0.1:8080/health, or in a terminal:
 ```shell
 curl http://localhost:8080/health
 ```
+
+## Accessing the database
+
+#### To view logs:
+```shell
+docker logs gym-roster-postgres
+```
+
+#### To connect to PostgreSQL inside the container:
+Access the container shell:
+```shell
+docker exec -it gym-roster-postgres bash
+```
+
+Use psql:
+```shell
+psql -U postgres
+```
+
+#### To connect to PostgreSQL outside of the container:
+```shell
+psql -h localhost -p 5432 -U postgres -d gymroster
+```
+
+#### References:
+* [How to Use the Postgres Docker Official Image](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)

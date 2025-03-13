@@ -1,8 +1,17 @@
 
 # Development Setup
-This document provides information for a developer to get their local development environment configured so that they can do active development on this module. Note that the instructions are geared for a macOS environment. 
+This document provides information for a developer to get their local development environment configured so that they can do active development on this module. The instructions are specific to a macOS environment. 
 
-## Software needed
+### Table of Contents
+* [Required Software](#required-software)
+* [Install Homebrew](#install-homebrew)
+* [Install Java](#install-java)
+* [Install Maven](#install-maven)
+* [Install Docker](#install-docker)
+* [Install PostgreSQL](#install-postgresql)
+* [Install psql](#install-psql)
+
+## Required Software
 * Homebrew - A package manager for installing software libraries and packages.
 * Java 21 - The programming language used to develop this service.
 * Maven 3.9.x - The build tool used for this Java service.
@@ -84,13 +93,13 @@ brew install maven
 ## Install Docker
 Docker allows for the creation, packaging and execution of a managed environments for applications. Go to the [Docker](https://docs.docker.com/get-started/get-docker/) website for information on its installation.
 
-## Install Postgres
-### 1. Download the Postgres image
+## Install PostgreSQL
+### 1. Download the PostgreSQL image
 ```shell
 docker pull postgres:17-alpine
 ```
 
-### 2. Create and start a container from the Postgres image
+### 2. Create and start a container from the PostgreSQL image
 ```shell
 docker run --name gym-roster-postgres -p 5432:5432 -e POSTGRES_PASSWORD=gympass -d postgres:17-alpine 
 ```
@@ -107,28 +116,9 @@ Where:
 * `postgres:17-alpine`
    * The image that docker will use to create the container. The image is pulled from Docker Hub if it's not already available locally. 
 
-## Access the Postgres container
-#### To view logs:
-```shell
-docker logs gym-roster-postgres
-```
+## Install psql
+Psql is a command line client tool for querying the PostgreSQL database and is an optional step as there are many tools for interfacing with the database.
 
-#### To access the container's shell:
-```shell
-docker exec -it gym-roster-postgres bash
-```
-
-#### To connect to Postgres: Inside the container, you can use the psql command to interact with the Postgres database:
-Access the container shell as shown above and then use the `psql` CLI. 
-```shell
-psql -U postgres
-```
-This will open a PostgreSQL interactive shell for the postgres user, using the `gympass` you specified earlier.
-
-#### References:
-* [How to Use the Postgres Docker Official Image](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)
-
-## Install psql (Optional)
 Homebrew's package for the PostgreSQL client tools is libpq, which includes psql, pg_dump, and other client utilities.)
 ```shell
 brew install libpq
@@ -139,11 +129,7 @@ Finally, symlink psql (and other libpq tools) into /usr/local/bin. (Note: libpq 
 brew link --force libpq
 ```
 
-## To connect:
+To connect to psql, run the command below. You will be prompted for your password.
 ```shell
 psql -h localhost -p 5432 -U postgres
 ```
-
-#### References:
-* Instructions came from [Install psql without PostgreSQL on MacOS](https://www.linkedin.com/pulse/install-psql-without-postgresql-macos-dexter-hardy/)
-
