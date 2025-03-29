@@ -15,7 +15,7 @@ Refer to [Development Setup](docs/development-setup.md) for prerequisite softwar
 
 ## Installing
 ```text
-git clone git@github.com:whyceewhite/gym-roster.git
+git clone git@github.com:doubletuck/gym-roster.git
 cd gym-roster
 ```
 

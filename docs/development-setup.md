@@ -133,3 +133,12 @@ To connect to psql, run the command below. You will be prompted for your passwor
 ```shell
 psql -h localhost -p 5432 -U postgres
 ```
+
+## Create gymroster database
+
+First, connect to the PostgreSQL instance that was created (for example, using the psql instructions above).
+
+Run the `create database <database-name>` command.
+```text
+create database gymroster;
+```
