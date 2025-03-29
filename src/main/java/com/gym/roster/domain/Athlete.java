@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +20,11 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "athlete")
+@Table(name = "athlete", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_athlete",
+                columnNames = {"first_name", "last_name", "home_city"})
+})
 public class Athlete {
 
     @Id
@@ -32,13 +37,13 @@ public class Athlete {
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
-    @Column(name = "home_town", nullable = false)
-    private String homeTown;
+    @Column(name = "home_city", nullable = false)
+    private String homeCity;
 
-    @Column(name = "home_state_code")
+    @Column(name = "home_state_code", length = 2)
     private String homeState;
 
-    @Column(name = "home_country_code")
+    @Column(name = "home_country_code", length = 3)
     private String homeCountry;
 
     @Column(name = "club_name")

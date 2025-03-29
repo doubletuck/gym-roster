@@ -10,7 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -50,7 +49,7 @@ public class AthleteController {
             updatedAthlete.setLastName(athlete.getLastName());
             updatedAthlete.setHomeCountry(athlete.getHomeCountry());
             updatedAthlete.setHomeState(athlete.getHomeState());
-            updatedAthlete.setHomeTown(athlete.getHomeTown());
+            updatedAthlete.setHomeCity(athlete.getHomeCity());
             return new ResponseEntity<>(athleteService.save(updatedAthlete), HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

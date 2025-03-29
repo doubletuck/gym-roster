@@ -2,12 +2,15 @@ package com.gym.roster.domain;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.EnumType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -20,7 +23,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "college_conference_history")
+@Table(name = "college_conference_history", uniqueConstraints = {
+        @UniqueConstraint(
+                name = "uk_college_conf_history",
+                columnNames = {"college_id", "start_year"})
+})
 public class CollegeConferenceHistory {
 
     @Id
@@ -32,15 +39,17 @@ public class CollegeConferenceHistory {
     private College college;
 
     @Column(name = "start_year", nullable = false)
-    private Integer startYear;
+    private Short startYear;
 
     @Column(name = "end_year")
-    private Integer endYear;
+    private Short endYear;
 
-    @Column(name = "conference", nullable = false)
+    @Column(name = "conference", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private Conference conference;
 
-    @Column(name = "division", nullable = false)
+    @Column(name = "division", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private Division division;
 
     @Column(name = "creation_timestamp", nullable = false, updatable = false)
