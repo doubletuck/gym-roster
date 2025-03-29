@@ -1,18 +1,13 @@
-# PSQL Cheat Sheet
+# SQL and PSQL Cheat Sheet
 
 ### Connect to psql
 ```shell
 psql -h localhost -p 5432 -U postgres
 ```
 
-### List of databases in instance
+### List databases in instance
 ```text
 \l
-```
-
-Example:
-```text
-postgres=# \l
 ```
 
 ### Connect to a database
@@ -20,17 +15,22 @@ postgres=# \l
 \c <database-name>
 ```
 
-Example:
-```text
-postgres=# \c gymroster 
-```
-
 ### Drop database
 ```text
 DROP DATABASE <database-name>;
 ```
 
-Example:
+### List database tables
 ```text
-drop database gymroster;    
+\dt
+```
+
+### Describe table
+```text
+\d <table-name>
+```
+
+For additional metadata, use:
+```text
+\d+ <table-name>
 ```
