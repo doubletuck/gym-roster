@@ -1,6 +1,11 @@
 logging:
   level:
     com.gym: "DEBUG"
+    root: "INFO"
+  pattern:
+    file: "%d{yyyy-MM-dd HH:mm:ss.SSSXXX} %5p ${PID:- } --- [%15.15t] %-40.40logger{39} : %m%n%wEx"
+  file:
+    name: logs/application.log
 
 spring:
   datasource:
