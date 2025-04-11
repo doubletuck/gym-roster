@@ -4,4 +4,4 @@ spring:
     username: "postgres"
     password: "gympass"
   jpa:
-    show-sql: true
+    show-sql: false

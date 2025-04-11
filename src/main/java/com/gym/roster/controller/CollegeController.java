@@ -1,6 +1,7 @@
 package com.gym.roster.controller;
 
 import com.gym.roster.domain.College;
+import com.gym.roster.parser.CollegeImportResult;
 import com.gym.roster.service.CollegeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -17,7 +18,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -75,5 +78,15 @@ public class CollegeController {
         Pageable pageable = PageRequest.of(page, size);
         Page<College> colleges = collegeService.getPaginatedEntities(pageable);
         return ResponseEntity.ok(colleges);
+    }
+
+    @PostMapping("/file-import")
+    public ResponseEntity<List<CollegeImportResult>> importCollegesFromFile(@RequestParam MultipartFile file) {
+        try {
+            List<CollegeImportResult> collegeImportResults = collegeService.importCollegesFromFile(file);
+            return ResponseEntity.ok(collegeImportResults);
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().build();
+        }
     }
 }

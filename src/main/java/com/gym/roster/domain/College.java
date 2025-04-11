@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.ToString;
 
 import java.time.Instant;
 import java.util.List;
@@ -24,6 +25,7 @@ import java.util.List;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@ToString
 @Entity
 @Table(name = "college", uniqueConstraints = {
         @UniqueConstraint(
@@ -60,8 +62,14 @@ public class College {
     @Enumerated(EnumType.STRING)
     private Region region;
 
-    @OneToMany(mappedBy = "college", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
-    private List<CollegeConferenceHistory> conferenceHistoryList;
+    @Column(name = "nickname", length = 30)
+    private String nickname;
+
+    @Column(name = "team_url")
+    private String teamUrl;
+
+//    @OneToMany(mappedBy = "college", cascade = CascadeType.REMOVE, fetch = FetchType.LAZY)
+//    private List<CollegeConferenceHistory> conferenceHistoryList;
 
     @Column(name = "creation_timestamp", nullable = false, updatable = false)
     private Instant creationTimestamp;

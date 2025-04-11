@@ -17,4 +17,16 @@ public enum Conference {
     SEC,
     WIAC;
 
+    public static Conference find(String text) {
+
+        if (text != null && !text.isEmpty()) {
+            text = text.trim();
+            for (Conference conference : Conference.values()) {
+                if (conference.name().equalsIgnoreCase(text)) {
+                    return conference;
+                }
+            }
+        }
+        return null;
+    }
 }
