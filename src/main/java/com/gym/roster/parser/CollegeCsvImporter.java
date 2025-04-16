@@ -23,11 +23,9 @@ public class CollegeCsvImporter {
     private final static Logger logger = LoggerFactory.getLogger(CollegeCsvImporter.class);
 
     public enum Headers {
-        RANK,
-        SHORT_NAME, LONG_NAME, CITY, STATE,
+        CODE_NAME, SHORT_NAME, LONG_NAME, CITY, STATE,
         CONFERENCE, DIVISION, REGION,
-        NICKNAME, TEAM_URL,
-        POWERED_BY;
+        NICKNAME, TEAM_URL;
     }
 
     public static List<College> parseFile(MultipartFile multipartFile) throws IOException{
@@ -36,6 +34,8 @@ public class CollegeCsvImporter {
         }
         File tempFile =  File.createTempFile("upload", ".tmp");
         multipartFile.transferTo(tempFile);
+        logger.debug("Saved uploaded college data file to a temporary file: {}.", tempFile.getAbsoluteFile());
+
         List<College> parsedFile = CollegeCsvImporter.parseFile(tempFile);
         tempFile.deleteOnExit();
         return parsedFile;
@@ -66,6 +66,7 @@ public class CollegeCsvImporter {
 
             for (CSVRecord record : records) {
                 College college = new College();
+                college.setCodeName(record.get(Headers.CODE_NAME));
                 college.setLongName(record.get(Headers.LONG_NAME));
                 college.setShortName(record.get(Headers.SHORT_NAME));
                 college.setNickname(record.get(Headers.NICKNAME));
@@ -76,7 +77,8 @@ public class CollegeCsvImporter {
                 college.setConference(Conference.find(record.get(Headers.CONFERENCE)));
                 college.setTeamUrl(record.get(Headers.TEAM_URL));
                 colleges.add(college);
-                logger.debug("Csv row parsed: {}", college);
+                logger.debug("File record {} - raw values: {}", record.getRecordNumber(), record.values());
+                logger.debug("File record {} - parsed values: {}", record.getRecordNumber(), college);
             }
         } catch (FileNotFoundException e) {
             logger.error("Cannot parse college CSV data because file '{}' could not be found.", file.getAbsolutePath(), e);

@@ -12,7 +12,8 @@ public class CollegeImportResult {
         ERROR;
     }
 
-    private String collegeShortName;
+    private String collegeCodeName;
     private Status importStatus;
     private College college;
+    private String message;
 }

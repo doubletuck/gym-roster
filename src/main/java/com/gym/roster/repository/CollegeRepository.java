@@ -10,6 +10,6 @@ import java.util.UUID;
 @Repository
 public interface CollegeRepository extends JpaRepository<College, UUID> {
 
-    @Query("SELECT c FROM College c WHERE c.shortName = ?1")
-    College findByShortName(String collegeShortName);
+    @Query("SELECT c FROM College c WHERE c.codeName = ?1")
+    College findByCodeName(String collegeCodeName);
 }

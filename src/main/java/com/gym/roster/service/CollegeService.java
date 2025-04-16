@@ -1,9 +1,12 @@
 package com.gym.roster.service;
 
 import com.gym.roster.domain.College;
+import com.gym.roster.exception.ValidationException;
 import com.gym.roster.parser.CollegeCsvImporter;
 import com.gym.roster.parser.CollegeImportResult;
 import com.gym.roster.repository.CollegeRepository;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,8 +20,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -26,17 +29,36 @@ public class CollegeService {
 
     public static final Logger logger = LoggerFactory.getLogger(CollegeService.class);
     private final CollegeRepository collegeRepository;
+    private final Validator validator;
 
     @Autowired
-    public CollegeService(CollegeRepository collegeRepository) {
+    public CollegeService(CollegeRepository collegeRepository, Validator validator) {
         this.collegeRepository = collegeRepository;
+        this.validator = validator;
     }
 
     public Optional<College> findById(UUID id) {
         return collegeRepository.findById(id);
     }
 
+    /**
+     * Saves the given college instance to the database. If any fields
+     * fail validation then a ValidationException is thrown. The returned
+     * college will contain fields that are updated by the system such
+     * as identifiers and last update timestamp.
+     *
+     * @param college The college instance to save to the database.
+     * @return The saved college instance with any updated fields.
+     * @throws ValidationException If college has validation constraint
+     * errors.
+     */
     public College save(College college) {
+
+        Set<ConstraintViolation<College>> errors = validator.validate(college);
+        if (!errors.isEmpty()) {
+            throw new ValidationException(errors);
+        }
+
         Instant now = Instant.now();
         if (college.getId() == null) {
             college.setCreationTimestamp(now);
@@ -53,42 +75,45 @@ public class CollegeService {
         return collegeRepository.findAll(pageable);
     }
 
-    public List<College> findAll() {
-        return collegeRepository.findAll();
-    }
-
     public List<CollegeImportResult> importCollegesFromFile(MultipartFile multipartFile) throws Exception {
 
+        logger.info("Initiating the import of college data from an uploaded file.");
         List<College> fileColleges = CollegeCsvImporter.parseFile(multipartFile);
+        logger.info("College data was parsed from the uploaded file. Total colleges parsed: {}.", fileColleges.size());
 
         ArrayList<CollegeImportResult> collegeImportResults = new ArrayList<>();
         for (College college : fileColleges) {
             collegeImportResults.add(processFileRow(college));
         }
+
+        logger.info("The import of college data from an uploaded file is completed.");
         return collegeImportResults;
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    protected CollegeImportResult processFileRow(College college) {
-
+    protected CollegeImportResult processFileRow(College fileCollege) {
         CollegeImportResult importResult = new CollegeImportResult();
-        importResult.setCollegeShortName(college.getShortName());
+        importResult.setCollegeCodeName(fileCollege.getCodeName());
 
-        College dbCollege = collegeRepository.findByShortName(college.getShortName());
+        College dbCollege = collegeRepository.findByCodeName(fileCollege.getCodeName());
         if (dbCollege == null) {
-            logger.debug("Creating the parsed college with short name '{}'.", college.getShortName());
             try {
-                dbCollege = save(college);
+                dbCollege = save(fileCollege);
                 importResult.setImportStatus(CollegeImportResult.Status.CREATED);
+            } catch (ValidationException e) {
+                importResult.setImportStatus(CollegeImportResult.Status.ERROR);
+                importResult.setMessage("Saving failed because of the following validation errors: "+ e.getErrorListText());
+                logger.error("Validation errors occurred when trying to save this college imported from the file: {}. The validation errors are: {}", fileCollege, e.getErrorListText());
             } catch (Exception e) {
                 importResult.setImportStatus(CollegeImportResult.Status.ERROR);
+                importResult.setMessage(e.getMessage());
                 logger.error(e.getMessage(), e);
             }
         } else {
-            logger.debug("College with short name '{}' already exists. Skipping import.", college.getShortName());
             importResult.setImportStatus(CollegeImportResult.Status.EXISTS);
         }
         importResult.setCollege(dbCollege);
+        logger.info("Import data result: {}", importResult);
         return importResult;
     }
 }

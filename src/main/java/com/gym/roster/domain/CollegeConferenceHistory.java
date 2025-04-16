@@ -35,7 +35,7 @@ public class CollegeConferenceHistory {
     private String id;
 
     @ManyToOne
-    @JoinColumn(name = "college_id", nullable = false) // Foreign key column
+    @JoinColumn(name = "college_id", nullable = false)
     private College college;
 
     @Column(name = "start_year", nullable = false)
