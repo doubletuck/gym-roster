@@ -41,6 +41,10 @@ public class CollegeService {
         return collegeRepository.findById(id);
     }
 
+    public College findByCodeName(String codeName) {
+        return collegeRepository.findByCodeName(codeName);
+    }
+
     /**
      * Saves the given college instance to the database. If any fields
      * fail validation then a ValidationException is thrown. The returned
@@ -95,7 +99,7 @@ public class CollegeService {
         CollegeImportResult importResult = new CollegeImportResult();
         importResult.setCollegeCodeName(fileCollege.getCodeName());
 
-        College dbCollege = collegeRepository.findByCodeName(fileCollege.getCodeName());
+        College dbCollege = findByCodeName(fileCollege.getCodeName());
         if (dbCollege == null) {
             try {
                 dbCollege = save(fileCollege);

@@ -1,5 +1,7 @@
 package com.gym.roster.service;
 
+import com.gym.roster.domain.Athlete;
+import com.gym.roster.domain.College;
 import com.gym.roster.domain.Roster;
 import com.gym.roster.repository.RosterRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -7,6 +9,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -29,7 +32,16 @@ public class RosterService {
         return rosterRepository.findById(id);
     }
 
+    public Roster findByYearCollegeAndAthlete(Short seasonYear, College college, Athlete athlete) {
+        return rosterRepository.findByYearCollegeAndAthlete(seasonYear, college, athlete);
+    }
+
     public Roster save(Roster member) {
+        Instant now = Instant.now();
+        if (member.getId() == null) {
+            member.setCreationTimestamp(now);
+        }
+        member.setLastUpdateTimestamp(now);
         return rosterRepository.save(member);
     }
 

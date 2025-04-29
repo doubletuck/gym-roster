@@ -7,6 +7,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -33,12 +34,15 @@ public class Athlete {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @NotBlank(message = "First name is required")
     @Column(name = "first_name", nullable = false)
     private String firstName;
 
+    @NotBlank(message = "Last name is required")
     @Column(name = "last_name", nullable = false)
     private String lastName;
 
+    @NotBlank(message = "Long name is required")
     @Column(name = "home_city", nullable = false)
     private String homeCity;
 
@@ -56,4 +60,28 @@ public class Athlete {
 
     @Column(name = "last_update_timestamp", nullable = false)
     private Instant lastUpdateTimestamp;
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName.trim();
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName.trim();
+    }
+
+    public void setHomeCity(String homeCity) {
+        this.homeCity = (homeCity == null || homeCity.isBlank()) ? null : homeCity.trim();
+    }
+
+    public void setHomeState(String homeState) {
+        this.homeState = (homeState == null || homeState.isBlank()) ? null : homeState.trim();
+    }
+
+    public void setHomeCountry(String homeCountry) {
+        this.homeCountry = (homeCountry == null || homeCountry.isBlank()) ? null : homeCountry.trim();
+    }
+
+    public void setClubName(String clubName) {
+        this.clubName = (clubName == null || clubName.isBlank()) ? null : clubName.trim();
+    }
 }
