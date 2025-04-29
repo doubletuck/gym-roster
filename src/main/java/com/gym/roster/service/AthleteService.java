@@ -25,6 +25,10 @@ public class AthleteService {
         return athleteRepository.findById(id);
     }
 
+    public Athlete findByNameAndHomeCity(String firstName, String lastName, String homeCity) {
+        return athleteRepository.findByNameAndHomeCity(firstName, lastName, homeCity);
+    }
+
     public Athlete save(Athlete athlete) {
         Instant now = Instant.now();
         if (athlete.getId() == null) {

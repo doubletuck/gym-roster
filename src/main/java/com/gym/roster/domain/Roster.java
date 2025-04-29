@@ -10,6 +10,8 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -38,17 +40,21 @@ public class Roster {
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
 
+    @NotNull(message = "College is required")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "college_id", nullable = false)
     private College college;
 
+    @NotNull(message = "Season year is required")
     @Column(name = "season_year", nullable = false)
     private Short seasonYear;
 
+    @NotNull(message = "Athlete is required")
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "athlete_id", nullable = false)
     private Athlete athlete;
 
+    @NotBlank(message = "Academic class is required")
     @Column(name = "class_code", nullable = false)
     private String classCode;
 
@@ -60,4 +66,12 @@ public class Roster {
 
     @Column(name = "last_update_timestamp", nullable = false)
     private Instant lastUpdateTimestamp;
+
+    public void setClassCode(String classCode) {
+        this.classCode = (classCode == null || classCode.isBlank()) ? null : classCode.trim();
+    }
+
+    public void setPosition(String position) {
+        this.position = (position == null || position.isBlank()) ? null : position.trim();
+    }
 }

@@ -25,7 +25,7 @@ public class CollegeCsvImporter {
     public enum Headers {
         CODE_NAME, SHORT_NAME, LONG_NAME, CITY, STATE,
         CONFERENCE, DIVISION, REGION,
-        NICKNAME, TEAM_URL;
+        NICKNAME, TEAM_URL
     }
 
     public static List<College> parseFile(MultipartFile multipartFile) throws IOException{
@@ -41,15 +41,7 @@ public class CollegeCsvImporter {
         return parsedFile;
     }
 
-    public static List<College> parseFile(String fileName) throws IOException {
-        if (fileName == null) {
-            throw new IllegalArgumentException("File name cannot be null.");
-        }
-        File file = new File(fileName);
-        return CollegeCsvImporter.parseFile(file);
-    }
-
-    public static List<College> parseFile(File file) throws IOException{
+    public static List<College> parseFile(File file) throws IOException {
         if (file == null) {
             throw new IllegalArgumentException("File cannot be null.");
         }
