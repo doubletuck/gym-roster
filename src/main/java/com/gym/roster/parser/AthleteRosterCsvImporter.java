@@ -7,13 +7,10 @@ import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
 import com.gym.roster.service.RosterService;
 import lombok.Getter;
-import lombok.Setter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
@@ -50,7 +47,6 @@ public class AthleteRosterCsvImporter {
         FIRST_NAME, LAST_NAME, COLLEGE_CLASS,
         HOME_TOWN, HOME_STATE, HOME_COUNTRY,
         CLUB, POSITION
-
     }
 
     public void parseFile(MultipartFile multipartFile) throws IOException{
