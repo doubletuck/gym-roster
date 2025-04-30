@@ -16,7 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/roster")
+@RequestMapping("/roster/athlete")
 public class RosterController {
 
     private final RosterService rosterService;
@@ -30,7 +30,7 @@ public class RosterController {
         this.athleteService = athleteService;
     }
 
-    @PostMapping("/athlete/file-import")
+    @PostMapping("/file-import")
     public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
         try {
             AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, rosterService);

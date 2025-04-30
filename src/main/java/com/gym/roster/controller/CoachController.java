@@ -1,7 +1,7 @@
 package com.gym.roster.controller;
 
-import com.gym.roster.domain.Athlete;
-import com.gym.roster.service.AthleteService;
+import com.gym.roster.domain.Coach;
+import com.gym.roster.service.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -21,56 +21,52 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.UUID;
 
 @RestController
-@RequestMapping("/athlete")
-public class AthleteController {
+@RequestMapping("/coach")
+public class CoachController {
 
-    private final AthleteService athleteService;
+    private final CoachService coachService;
 
     @Autowired
-    public AthleteController(AthleteService athleteService) {
-        this.athleteService = athleteService;
+    public CoachController(CoachService coachService) {
+        this.coachService = coachService;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Athlete> findById(@PathVariable UUID id) {
-        return athleteService.findById(id)
+    public ResponseEntity<Coach> findById(@PathVariable UUID id) {
+        return coachService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping
-    public ResponseEntity<Athlete> create(@RequestBody Athlete athlete) {
-        Athlete createdAthlete = athleteService.save(athlete);
-        return new ResponseEntity<>(createdAthlete, HttpStatus.CREATED);
+    public ResponseEntity<Coach> create(@RequestBody Coach coach) {
+        Coach createdCoach = coachService.save(coach);
+        return new ResponseEntity<>(createdCoach, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Athlete> update(@PathVariable UUID id, @RequestBody Athlete athlete) {
-        return athleteService.findById(id)
-                .map(existingAthlete -> {
-                    existingAthlete.setClubName(athlete.getClubName());
-                    existingAthlete.setFirstName(athlete.getFirstName());
-                    existingAthlete.setLastName(athlete.getLastName());
-                    existingAthlete.setHomeCountry(athlete.getHomeCountry());
-                    existingAthlete.setHomeState(athlete.getHomeState());
-                    existingAthlete.setHomeCity(athlete.getHomeCity());
-                    return ResponseEntity.ok(athleteService.save(existingAthlete));
+    public ResponseEntity<Coach> update(@PathVariable UUID id, @RequestBody Coach coach) {
+        return coachService.findById(id)
+                .map(existingCoach -> {
+                    existingCoach.setFirstName(coach.getFirstName());
+                    existingCoach.setLastName(coach.getLastName());
+                    return ResponseEntity.ok(coachService.save(existingCoach));
                 })
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
-        athleteService.deleteById(id);
+        coachService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
 
     @GetMapping
-    public ResponseEntity<Page<Athlete>> getPaginatedEntities(
+    public ResponseEntity<Page<Coach>> getPaginatedEntities(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Athlete> athletes = athleteService.getPaginatedEntities(pageable);
-        return ResponseEntity.ok(athletes);
+        Page<Coach> coaches = coachService.getPaginatedEntities(pageable);
+        return ResponseEntity.ok(coaches);
     }
 }
