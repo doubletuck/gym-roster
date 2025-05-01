@@ -1,6 +1,6 @@
 package com.gym.roster.parser;
 
-import com.gym.roster.domain.Roster;
+import com.gym.roster.domain.AthleteRoster;
 import lombok.Data;
 
 @Data
@@ -16,6 +16,6 @@ public class AthleteRosterImportResult {
     private Long recordNumber;
     private Status athleteImportStatus;
     private Status rosterImportStatus;
-    private Roster roster;
+    private AthleteRoster roster;
     private String message;
 }

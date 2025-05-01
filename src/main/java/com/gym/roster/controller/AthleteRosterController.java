@@ -4,7 +4,7 @@ import com.gym.roster.parser.AthleteRosterCsvImporter;
 import com.gym.roster.parser.AthleteRosterImportResult;
 import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
-import com.gym.roster.service.RosterService;
+import com.gym.roster.service.AthleteRosterService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -17,15 +17,15 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/roster/athlete")
-public class RosterController {
+public class AthleteRosterController {
 
-    private final RosterService rosterService;
+    private final AthleteRosterService athleteRosterService;
     private final AthleteService athleteService;
     private final CollegeService collegeService;
 
     @Autowired
-    public RosterController(RosterService rosterService, CollegeService collegeService, AthleteService athleteService) {
-        this.rosterService = rosterService;
+    public AthleteRosterController(AthleteRosterService athleteRosterService, CollegeService collegeService, AthleteService athleteService) {
+        this.athleteRosterService = athleteRosterService;
         this.collegeService = collegeService;
         this.athleteService = athleteService;
     }
@@ -33,7 +33,7 @@ public class RosterController {
     @PostMapping("/file-import")
     public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
         try {
-            AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, rosterService);
+            AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, athleteRosterService);
             importer.parseFile(file);
             return ResponseEntity.ok(importer.getImportResults());
         } catch (Exception e) {
