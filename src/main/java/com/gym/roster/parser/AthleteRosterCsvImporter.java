@@ -22,7 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class AthleteRosterCsvImporter {
+public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
 
     private final static Logger logger = LoggerFactory.getLogger(AthleteRosterCsvImporter.class);
 
@@ -32,8 +32,6 @@ public class AthleteRosterCsvImporter {
 
     @Getter
     private final List<AthleteRosterImportResult> importResults = new ArrayList<>();
-    private final Map<String, College> collegeMap = new HashMap<>();
-    private File file;
     private AthleteRosterImportResult currentImportResult;
 
     public AthleteRosterCsvImporter(CollegeService collegeService, AthleteService athleteService, AthleteRosterService athleteRosterService) {
@@ -49,26 +47,11 @@ public class AthleteRosterCsvImporter {
         CLUB, POSITION
     }
 
-    public void parseFile(MultipartFile multipartFile) throws IOException{
-        if (multipartFile == null) {
-            throw new IllegalArgumentException("File upload stream cannot be null.");
-        }
-        logger.info("Saving uploaded data file '{}' to a temporary file. Size of file upload: {}.", multipartFile.getOriginalFilename(), multipartFile.getSize());
-        File tempFile =  File.createTempFile("upload", ".tmp");
-        multipartFile.transferTo(tempFile);
-        logger.info("Saved uploaded data file to temporary file: {}.", tempFile.getAbsoluteFile());
-
-        parseFile(tempFile);
-        logger.info("AthleteRoster Import {} - File processing completed. Deleting temporary file on exit.", tempFile.getName());
-        tempFile.deleteOnExit();
+    CollegeService getCollegeService() {
+        return collegeService;
     }
 
-    public void parseFile(File file) throws IOException {
-        if (file == null) {
-            throw new IllegalArgumentException("File cannot be null.");
-        }
-
-        this.file = file;
+    void parseFile() throws IOException {
         this.importResults.clear();
 
         try {
@@ -86,31 +69,39 @@ public class AthleteRosterCsvImporter {
                 currentImportResult = new AthleteRosterImportResult();
                 currentImportResult.setRecordNumber(record.getRecordNumber());
 
+                String collegeCodeName = record.get(CoachRosterCsvImporter.Headers.COLLEGE_CODE_NAME);
+                College college = fetchCollege(collegeCodeName);
+                if (college == null) {
+                    currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.ERROR);
+                    currentImportResult.setMessage("College name given in the file is not valid or is not supported: " + collegeCodeName + ".");
+                    continue;
+                }
+
                 Short seasonYear = Short.parseShort(record.get(Headers.YEAR));
-                College college = fetchCollege(record.get(Headers.COLLEGE_CODE_NAME));
                 Athlete athlete = fetchAthlete(record);
-                AthleteRoster roster = athleteRosterService.findByYearCollegeAndAthlete(seasonYear, college, athlete);
                 String academicClassCode = record.get(Headers.COLLEGE_CLASS).isBlank() ? null : record.get(Headers.COLLEGE_CLASS);
                 String position = record.get(Headers.POSITION).isBlank() ? null : record.get(Headers.POSITION);
 
-                if (roster != null) {
-                    currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.EXISTS);
-                    logger.info("AthleteRoster Import {} - Record {} - AthleteRoster exists: {}", file.getName(), record.getRecordNumber(), roster);
-                } else {
+                AthleteRoster roster = athleteRosterService.findByYearCollegeAndAthlete(seasonYear, college, athlete);
+                if (roster == null) {
                     roster = new AthleteRoster();
                     roster.setCollege(college);
                     roster.setSeasonYear(seasonYear);
                     roster.setAthlete(athlete);
                     roster.setClassCode(academicClassCode);
                     roster.setPosition(position);
-                    athleteRosterService.save(roster);
+                    roster = athleteRosterService.save(roster);
                     currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.CREATED);
                     logger.info("AthleteRoster Import {} - Record {} - AthleteRoster created: {}", file.getName(), record.getRecordNumber(), roster);
+                } else {
+                    currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.EXISTS);
+                    logger.info("AthleteRoster Import {} - Record {} - AthleteRoster exists: {}", file.getName(), record.getRecordNumber(), roster);
                 }
 
                 currentImportResult.setRoster(roster);
                 importResults.add(currentImportResult);
             }
+            logger.info("AthleteRoster Import {} - File processing completed.", file.getName());
         } catch (IOException e) {
             logger.error("An error occurred while parsing the athlete roster CSV file '{}'.", file.getAbsoluteFile(), e);
             throw e;
@@ -127,6 +118,7 @@ public class AthleteRosterCsvImporter {
         String clubName = record.get(Headers.CLUB).isBlank() ? null : record.get(Headers.CLUB);
 
         Athlete athlete = athleteService.findByNameAndHomeCity(firstName, lastName, homeCity);
+
         if (athlete == null) {
             athlete = new Athlete();
             athlete.setFirstName(firstName);
@@ -151,21 +143,5 @@ public class AthleteRosterCsvImporter {
         }
 
         return athlete;
-    }
-
-    private College fetchCollege(String collegeCodeName) {
-        if (collegeCodeName == null || collegeCodeName.isEmpty()) {
-            return null;
-        }
-
-        College college = collegeMap.get(collegeCodeName);
-        if (college == null) {
-            College tempCollege = collegeService.findByCodeName(collegeCodeName);
-            if (tempCollege != null) {
-                collegeMap.put(collegeCodeName, tempCollege);
-                college = tempCollege;
-            }
-        }
-        return college;
     }
 }
