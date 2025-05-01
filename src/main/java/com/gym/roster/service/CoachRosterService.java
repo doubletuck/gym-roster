@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Instant;
 import java.util.List;
@@ -28,12 +30,12 @@ public class CoachRosterService {
         return coachRosterRepository.findById(id);
     }
 
-    public CoachRoster findByYearAndCollegeAndAthlete(Short seasonYear, College college, Coach coach) {
+    public CoachRoster findByYearAndCollegeAndCoach(Short seasonYear, College college, Coach coach) {
         return coachRosterRepository.findByYearAndCollegeAndCoach(seasonYear, college, coach);
     }
 
-    public List<CoachRoster> findByYearAndCollegeCode(Short seasonYear, String collegeCode) {
-        return coachRosterRepository.findByYearAndCollegeCodeName(seasonYear, collegeCode);
+    public List<CoachRoster> findByYearAndCollegeCode(Short seasonYear, String collegeCodeName) {
+        return coachRosterRepository.findByYearAndCollegeCodeName(seasonYear, collegeCodeName);
     }
 
     public CoachRoster save(CoachRoster roster) {
@@ -47,6 +49,10 @@ public class CoachRosterService {
 
     public void deleteById(UUID id) {
         coachRosterRepository.deleteById(id);
+    }
+
+    public void deleteByYearAndCollegeCodeName(Short seasonYear, String collegeCodeName) {
+        coachRosterRepository.deleteByYearAndCollegeCodeName(seasonYear, collegeCodeName);
     }
 
     public Page<CoachRoster> getPaginatedEntities(Pageable pageable) {

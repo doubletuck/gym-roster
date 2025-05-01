@@ -2,8 +2,11 @@ package com.gym.roster.controller;
 
 import com.gym.roster.domain.Coach;
 import com.gym.roster.domain.CoachRoster;
+import com.gym.roster.parser.CoachRosterCsvImporter;
 import com.gym.roster.parser.CoachRosterImportResult;
 import com.gym.roster.service.CoachRosterService;
+import com.gym.roster.service.CoachService;
+import com.gym.roster.service.CollegeService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +28,14 @@ import java.util.UUID;
 public class CoachRosterController {
 
     private final CoachRosterService coachRosterService;
+    private final CollegeService collegeService;
+    private final CoachService coachService;
 
     @Autowired
-    public CoachRosterController(CoachRosterService coachRosterService) {
+    public CoachRosterController(CoachRosterService coachRosterService, CollegeService collegeService, CoachService coachService) {
         this.coachRosterService = coachRosterService;
+        this.collegeService = collegeService;
+        this.coachService = coachService;
     }
 
     @PostMapping
@@ -51,19 +58,26 @@ public class CoachRosterController {
         return ResponseEntity.ok(coachRosterService.findByYearAndCollegeCode(seasonYear, collegeCodeName));
     }
 
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
+        coachRosterService.deleteById(id);
+        return ResponseEntity.noContent().build();
+    }
+
     @DeleteMapping("/{seasonYear}/{collegeCodeName}")
     public ResponseEntity<Void> deleteCollegeCoachRosterForSeason(
             @PathVariable Short seasonYear,
             @PathVariable String collegeCodeName) {
-        //TODO
+        coachRosterService.deleteByYearAndCollegeCodeName(seasonYear, collegeCodeName);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/file-import")
     public ResponseEntity<List<CoachRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
         try {
-            List<CoachRosterImportResult> results = new ArrayList<>();
-            return ResponseEntity.ok(results);
+            CoachRosterCsvImporter importer = new CoachRosterCsvImporter(collegeService, coachService, coachRosterService);
+            importer.parseFile(file);
+            return ResponseEntity.ok(importer.getImportResults());
         } catch (Exception e) {
             return ResponseEntity.internalServerError().build();
         }
