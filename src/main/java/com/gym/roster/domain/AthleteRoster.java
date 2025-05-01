@@ -29,12 +29,12 @@ import java.time.Instant;
 @AllArgsConstructor
 @ToString
 @Entity
-@Table(name = "roster", uniqueConstraints = {
+@Table(name = "athlete_roster", uniqueConstraints = {
         @UniqueConstraint(
-                name = "uk_roster",
+                name = "uk_athlete_roster",
                 columnNames = {"season_year", "college_id", "athlete_id"})
 })
-public class Roster {
+public class AthleteRoster {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
