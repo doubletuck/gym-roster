@@ -19,6 +19,7 @@ import lombok.Setter;
 import lombok.ToString;
 
 import java.time.Instant;
+import java.util.UUID;
 
 @Getter
 @Setter
@@ -35,20 +36,20 @@ public class College {
 
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    private UUID id;
 
-    @NotBlank(message = "Code name is required")
-    @Size(max = 25, message = "Code name must have 25 or fewer characters")
-    @Column(name = "code_name", nullable = false, length = 25)
+    @NotNull(message = "Code name is required")
+    @Column(name = "code_name", nullable = false, length = 20)
     private String codeName;
 
     @NotBlank(message = "Short name is required")
-    @Size(max = 50, message = "Nickname must have 50 or fewer characters")
-    @Column(name = "short_name", nullable = false, length = 50)
+    @Size(max = 30, message = "Short name must have 30 or fewer characters")
+    @Column(name = "short_name", nullable = false, length = 30)
     private String shortName;
 
     @NotBlank(message = "Long name is required")
-    @Column(name = "long_name", nullable = false)
+    @Size(max = 50, message = "Long name must have 50 or fewer characters")
+    @Column(name = "long_name", nullable = false, length = 50)
     private String longName;
 
     @NotBlank(message = "City is required")
@@ -64,7 +65,7 @@ public class College {
     @Enumerated(EnumType.STRING)
     private Conference conference;
 
-    @NotNull(message = "State is required")
+    @NotNull(message = "Division is required")
     @Column(name = "division", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Division division;
@@ -74,8 +75,8 @@ public class College {
     @Enumerated(EnumType.STRING)
     private Region region;
 
-    @Size(max = 30, message = "Nickname must have 30 or fewer characters")
-    @Column(name = "nickname", length = 30)
+    @Size(max = 20, message = "Nickname must have 20 or fewer characters")
+    @Column(name = "nickname", length = 20)
     private String nickname;
 
     @Column(name = "team_url")

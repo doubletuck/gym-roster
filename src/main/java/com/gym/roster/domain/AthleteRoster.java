@@ -1,16 +1,7 @@
 package com.gym.roster.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
-import jakarta.persistence.UniqueConstraint;
-import jakarta.validation.constraints.NotBlank;
+import com.doubletuck.gym.common.model.AcademicYear;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -54,12 +45,13 @@ public class AthleteRoster {
     @JoinColumn(name = "athlete_id", nullable = false)
     private Athlete athlete;
 
-    @NotBlank(message = "Academic class is required")
-    @Column(name = "class_code", nullable = false)
-    private String classCode;
+    @NotNull(message = "Academic year is required")
+    @Column(name = "academic_year", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private AcademicYear academicYear;
 
-    @Column(name = "position")
-    private String position;
+    @Column(name = "event", length = 20)
+    private String event;
 
     @Column(name = "creation_timestamp", nullable = false, updatable = false)
     private Instant creationTimestamp;
@@ -67,11 +59,7 @@ public class AthleteRoster {
     @Column(name = "last_update_timestamp", nullable = false)
     private Instant lastUpdateTimestamp;
 
-    public void setClassCode(String classCode) {
-        this.classCode = (classCode == null || classCode.isBlank()) ? null : classCode.trim();
-    }
-
-    public void setPosition(String position) {
-        this.position = (position == null || position.isBlank()) ? null : position.trim();
+    public void setEvent(String position) {
+        this.event = (position == null || position.isBlank()) ? null : position.trim();
     }
 }

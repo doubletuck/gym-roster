@@ -1,5 +1,6 @@
 package com.gym.roster.domain;
 
+import com.doubletuck.gym.common.model.StaffRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -35,9 +36,10 @@ public class CoachRoster {
     @JoinColumn(name = "coach_id", nullable = false)
     private Coach coach;
 
-    @NotBlank(message = "Role code is required")
-    @Column(name = "role_code", nullable = false)
-    private String roleCode;
+    @NotNull(message = "Role code is required")
+    @Column(name = "role_code", nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
+    private StaffRole roleCode;
 
     @Column(name = "creation_timestamp", nullable = false, updatable = false)
     private Instant creationTimestamp;

@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 import java.time.Instant;
@@ -27,11 +28,13 @@ public class Coach {
     private UUID id;
 
     @NotBlank(message = "First name is required")
-    @Column(name = "first_name", nullable = false)
+    @Size(max = 30, message = "First name must have 30 or fewer characters")
+    @Column(name = "first_name", nullable = false, length = 30)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Column(name = "last_name", nullable = false)
+    @Size(max = 30, message = "Last name must have 30 or fewer characters")
+    @Column(name = "last_name", nullable = false, length = 30)
     private String lastName;
 
     @Column(name = "creation_timestamp", nullable = false, updatable = false)

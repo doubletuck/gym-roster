@@ -1,5 +1,6 @@
 package com.gym.roster.parser;
 
+import com.doubletuck.gym.common.model.AcademicYear;
 import com.gym.roster.domain.Athlete;
 import com.gym.roster.domain.College;
 import com.gym.roster.domain.AthleteRoster;
@@ -11,16 +12,12 @@ import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
 
@@ -42,9 +39,9 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
 
     public enum Headers {
         COLLEGE_CODE_NAME, YEAR,
-        FIRST_NAME, LAST_NAME, COLLEGE_CLASS,
+        FIRST_NAME, LAST_NAME, ACADEMIC_YEAR,
         HOME_TOWN, HOME_STATE, HOME_COUNTRY,
-        CLUB, POSITION
+        CLUB, EVENT
     }
 
     CollegeService getCollegeService() {
@@ -79,8 +76,8 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
 
                 Short seasonYear = Short.parseShort(record.get(Headers.YEAR));
                 Athlete athlete = fetchAthlete(record);
-                String academicClassCode = record.get(Headers.COLLEGE_CLASS).isBlank() ? null : record.get(Headers.COLLEGE_CLASS);
-                String position = record.get(Headers.POSITION).isBlank() ? null : record.get(Headers.POSITION);
+                AcademicYear academicYear = AcademicYear.valueOf(record.get(Headers.ACADEMIC_YEAR));
+                String event = record.get(Headers.EVENT).isBlank() ? null : record.get(Headers.EVENT);
 
                 AthleteRoster roster = athleteRosterService.findByYearCollegeAndAthlete(seasonYear, college, athlete);
                 if (roster == null) {
@@ -88,8 +85,8 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
                     roster.setCollege(college);
                     roster.setSeasonYear(seasonYear);
                     roster.setAthlete(athlete);
-                    roster.setClassCode(academicClassCode);
-                    roster.setPosition(position);
+                    roster.setAcademicYear(academicYear);
+                    roster.setEvent(event);
                     roster = athleteRosterService.save(roster);
                     currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.CREATED);
                     logger.info("AthleteRoster Import {} - Record {} - AthleteRoster created: {}", file.getName(), record.getRecordNumber(), roster);
@@ -103,7 +100,7 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
             }
             logger.info("AthleteRoster Import {} - File processing completed.", file.getName());
         } catch (IOException e) {
-            logger.error("An error occurred while parsing the athlete roster CSV file '{}'.", file.getAbsoluteFile(), e);
+            logger.error("An error occurred while parsing the athlete roster CSV file '{}': {}", file.getAbsoluteFile(), e.getMessage());
             throw e;
         }
     }
