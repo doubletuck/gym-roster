@@ -8,6 +8,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -35,15 +36,18 @@ public class Athlete {
     private UUID id;
 
     @NotBlank(message = "First name is required")
-    @Column(name = "first_name", nullable = false)
+    @Size(max = 30, message = "First name must have 30 or fewer characters")
+    @Column(name = "first_name", nullable = false, length = 30)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Column(name = "last_name", nullable = false)
+    @Size(max = 30, message = "Last name must have 30 or fewer characters")
+    @Column(name = "last_name", nullable = false, length = 30)
     private String lastName;
 
-    @NotBlank(message = "Long name is required")
-    @Column(name = "home_city", nullable = false)
+    @NotBlank(message = "Home city is required")
+    @Size(max = 30, message = "Home city must have 30 or fewer characters")
+    @Column(name = "home_city", nullable = false, length = 30)
     private String homeCity;
 
     @Column(name = "home_state_code", length = 2)
@@ -52,7 +56,7 @@ public class Athlete {
     @Column(name = "home_country_code", length = 3)
     private String homeCountry;
 
-    @Column(name = "club_name")
+    @Column(name = "club_name", length = 50)
     private String clubName;
 
     @Column(name = "creation_timestamp", nullable = false, updatable = false)

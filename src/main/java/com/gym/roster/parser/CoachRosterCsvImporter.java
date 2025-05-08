@@ -1,5 +1,6 @@
 package com.gym.roster.parser;
 
+import com.doubletuck.gym.common.model.StaffRole;
 import com.gym.roster.domain.Coach;
 import com.gym.roster.domain.CoachRoster;
 import com.gym.roster.domain.College;
@@ -73,7 +74,7 @@ public class CoachRosterCsvImporter extends AbstractRosterCsvImporter {
 
                 Short seasonYear = Short.parseShort(record.get(Headers.YEAR));
                 Coach coach = fetchCoach(record);
-                String role = record.get(Headers.ROLE).isBlank() ? null : record.get(Headers.ROLE);
+                StaffRole role = StaffRole.valueOf(record.get(Headers.ROLE));
 
                 CoachRoster roster = coachRosterService.findByYearAndCollegeAndCoach(seasonYear, college, coach);
                 if (roster == null) {
@@ -95,7 +96,7 @@ public class CoachRosterCsvImporter extends AbstractRosterCsvImporter {
             }
             logger.info("CoachRoster Import {} - File processing completed.", file.getName());
         } catch (IOException e) {
-            logger.error("An error occurred while parsing the coach roster CSV file '{}'.", file.getAbsoluteFile(), e);
+            logger.error("An error occurred while parsing the coach roster CSV file '{}': {}", file.getAbsoluteFile(), e.getMessage() );
             throw e;
         }
     }

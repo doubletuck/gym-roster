@@ -7,6 +7,8 @@ import com.gym.roster.parser.CoachRosterImportResult;
 import com.gym.roster.service.CoachRosterService;
 import com.gym.roster.service.CoachService;
 import com.gym.roster.service.CollegeService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -26,6 +28,8 @@ import java.util.UUID;
 @RestController
 @RequestMapping("/roster/coach")
 public class CoachRosterController {
+
+    private final static Logger logger = LoggerFactory.getLogger(CoachRosterController.class);
 
     private final CoachRosterService coachRosterService;
     private final CollegeService collegeService;
@@ -79,6 +83,7 @@ public class CoachRosterController {
             importer.parseFile(file);
             return ResponseEntity.ok(importer.getImportResults());
         } catch (Exception e) {
+            logger.error("Error importing coach roster file: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();
         }
     }
