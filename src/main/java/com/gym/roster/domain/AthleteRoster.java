@@ -25,15 +25,11 @@ import java.time.Instant;
                 name = "uk_athlete_roster",
                 columnNames = {"season_year", "college_id", "athlete_id"})
 })
-public class AthleteRoster {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+public class AthleteRoster extends BaseEntity {
 
     @NotNull(message = "College is required")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "college_id", nullable = false)
+    @JoinColumn(name = "college_id", nullable = false, foreignKey = @ForeignKey(name = "fk_athlete_roster_college"))
     private College college;
 
     @NotNull(message = "Season year is required")
@@ -42,7 +38,7 @@ public class AthleteRoster {
 
     @NotNull(message = "Athlete is required")
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "athlete_id", nullable = false)
+    @JoinColumn(name = "athlete_id", nullable = false, foreignKey = @ForeignKey(name = "fk_athlete_roster_athlete"))
     private Athlete athlete;
 
     @NotNull(message = "Academic year is required")
@@ -52,12 +48,6 @@ public class AthleteRoster {
 
     @Column(name = "event", length = 20)
     private String event;
-
-    @Column(name = "creation_timestamp", nullable = false, updatable = false)
-    private Instant creationTimestamp;
-
-    @Column(name = "last_update_timestamp", nullable = false)
-    private Instant lastUpdateTimestamp;
 
     public void setEvent(String position) {
         this.event = (position == null || position.isBlank()) ? null : position.trim();

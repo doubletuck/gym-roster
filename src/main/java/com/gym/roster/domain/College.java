@@ -1,12 +1,10 @@
 package com.gym.roster.domain;
 
+import com.doubletuck.gym.common.model.State;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
@@ -17,9 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.Instant;
-import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
@@ -32,11 +29,9 @@ import java.util.UUID;
                 name = "uk_college",
                 columnNames = {"code_name"})
 })
-public class College {
+public class College extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private final static Logger logger = LoggerFactory.getLogger(College.class);
 
     @NotNull(message = "Code name is required")
     @Column(name = "code_name", nullable = false, length = 20)
@@ -58,7 +53,8 @@ public class College {
 
     @NotNull(message = "State is required")
     @Column(name = "state_code", nullable = false, length = 2)
-    private String state;
+    @Enumerated(EnumType.STRING)
+    private State state;
 
     @NotNull(message = "Conference is required")
     @Column(name = "conference", nullable = false, length = 20)
@@ -82,9 +78,14 @@ public class College {
     @Column(name = "team_url")
     private String teamUrl;
 
-    @Column(name = "creation_timestamp", nullable = false, updatable = false)
-    private Instant creationTimestamp;
-
-    @Column(name = "last_update_timestamp", nullable = false)
-    private Instant lastUpdateTimestamp;
+    public void setState(String state) {
+        if (state == null || state.trim().isEmpty()) {
+            this.state = null;
+            return;
+        }
+        this.state = State.find(state);
+        if (this.state == null) {
+            logger.warn("Home state is invalid: {}. Setting the state to null for athlete: {}", state, this.getId());
+        }
+    }
 }

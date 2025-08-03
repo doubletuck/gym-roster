@@ -1,10 +1,11 @@
 package com.gym.roster.domain;
 
+import com.doubletuck.gym.common.model.Country;
+import com.doubletuck.gym.common.model.State;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.Table;
 import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.NotBlank;
@@ -14,9 +15,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.Instant;
-import java.util.UUID;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
@@ -29,11 +29,9 @@ import java.util.UUID;
                 name = "uk_athlete",
                 columnNames = {"first_name", "last_name", "home_city"})
 })
-public class Athlete {
+public class Athlete extends BaseEntity {
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private UUID id;
+    private final static Logger logger = LoggerFactory.getLogger(Athlete.class);
 
     @NotBlank(message = "First name is required")
     @Size(max = 30, message = "First name must have 30 or fewer characters")
@@ -46,24 +44,20 @@ public class Athlete {
     private String lastName;
 
     @NotBlank(message = "Home city is required")
-    @Size(max = 30, message = "Home city must have 30 or fewer characters")
-    @Column(name = "home_city", nullable = false, length = 30)
+    @Size(max = 30, message = "Home city must have 50 or fewer characters")
+    @Column(name = "home_city", nullable = false, length = 50)
     private String homeCity;
 
     @Column(name = "home_state_code", length = 2)
-    private String homeState;
+    @Enumerated(EnumType.STRING)
+    private State homeState;
 
     @Column(name = "home_country_code", length = 3)
-    private String homeCountry;
+    @Enumerated(EnumType.STRING)
+    private Country homeCountry;
 
     @Column(name = "club_name", length = 50)
     private String clubName;
-
-    @Column(name = "creation_timestamp", nullable = false, updatable = false)
-    private Instant creationTimestamp;
-
-    @Column(name = "last_update_timestamp", nullable = false)
-    private Instant lastUpdateTimestamp;
 
     public void setFirstName(String firstName) {
         this.firstName = firstName.trim();
@@ -77,12 +71,34 @@ public class Athlete {
         this.homeCity = (homeCity == null || homeCity.isBlank()) ? null : homeCity.trim();
     }
 
+    public void setHomeState(State homeState) {
+        this.homeState = homeState;
+    }
+
     public void setHomeState(String homeState) {
-        this.homeState = (homeState == null || homeState.isBlank()) ? null : homeState.trim();
+        if (homeState == null || homeState.trim().isEmpty()) {
+            this.homeState = null;
+            return;
+        }
+        this.homeState = State.find(homeState);
+        if (this.homeState == null) {
+            logger.warn("Home state is invalid: {}. Setting the homeState to null for athlete: {}", homeState, this.getId());
+        }
+    }
+
+    public void setHomeCountry(Country homeCountry) {
+        this.homeCountry = homeCountry;
     }
 
     public void setHomeCountry(String homeCountry) {
-        this.homeCountry = (homeCountry == null || homeCountry.isBlank()) ? null : homeCountry.trim();
+        if (homeCountry == null || homeCountry.trim().isEmpty()) {
+            this.homeCountry = null;
+            return;
+        }
+        this.homeCountry = Country.find(homeCountry);
+        if (this.homeCountry == null) {
+            logger.warn("Home country is invalid: {}. Setting the homeCountry to null for athlete: {}", homeCountry, this.getId());
+        }
     }
 
     public void setClubName(String clubName) {
