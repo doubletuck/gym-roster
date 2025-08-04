@@ -1,6 +1,7 @@
 package com.gym.roster.domain;
 
 import com.doubletuck.gym.common.model.AcademicYear;
+import com.doubletuck.gym.common.model.Event;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -42,14 +43,22 @@ public class AthleteRoster extends BaseEntity {
     private Athlete athlete;
 
     @NotNull(message = "Academic year is required")
-    @Column(name = "academic_year", nullable = false, length = 20)
+    @Column(name = "academic_year_code", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private AcademicYear academicYear;
 
-    @Column(name = "event", length = 20)
-    private String event;
+    @Column(name = "event_code", length = 20)
+    @Enumerated(EnumType.STRING)
+    private Event event;
 
-    public void setEvent(String position) {
-        this.event = (position == null || position.isBlank()) ? null : position.trim();
+    public void setEvent(String event) {
+        if (event == null || event.trim().isEmpty()) {
+            this.event = null;
+            return;
+        }
+        this.event = Event.find(event);
+        if (this.event == null) {
+            throw new IllegalArgumentException("Event is invalid: " + event);
+        }
     }
 }
