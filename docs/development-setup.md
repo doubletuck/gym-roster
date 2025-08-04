@@ -94,6 +94,7 @@ brew install maven
 Docker allows for the creation, packaging and execution of a managed environments for applications. Go to the [Docker](https://docs.docker.com/get-started/get-docker/) website for information on its installation.
 
 ## Install PostgreSQL
+
 ### 1. Download the PostgreSQL image
 ```shell
 docker pull postgres:17-alpine

@@ -15,8 +15,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 @Getter
 @Setter
@@ -30,8 +28,6 @@ import org.slf4j.LoggerFactory;
                 columnNames = {"first_name", "last_name", "home_city"})
 })
 public class Athlete extends BaseEntity {
-
-    private final static Logger logger = LoggerFactory.getLogger(Athlete.class);
 
     @NotBlank(message = "First name is required")
     @Size(max = 30, message = "First name must have 30 or fewer characters")
@@ -82,7 +78,7 @@ public class Athlete extends BaseEntity {
         }
         this.homeState = State.find(homeState);
         if (this.homeState == null) {
-            logger.warn("Home state is invalid: {}. Setting the homeState to null for athlete: {}", homeState, this.getId());
+            throw new IllegalArgumentException("State is invalid: " + homeState);
         }
     }
 
@@ -97,7 +93,7 @@ public class Athlete extends BaseEntity {
         }
         this.homeCountry = Country.find(homeCountry);
         if (this.homeCountry == null) {
-            logger.warn("Home country is invalid: {}. Setting the homeCountry to null for athlete: {}", homeCountry, this.getId());
+            throw new IllegalArgumentException("Country is invalid: " + homeCountry);
         }
     }
 
