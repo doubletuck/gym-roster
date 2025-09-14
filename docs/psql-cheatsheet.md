@@ -1,9 +1,20 @@
 # SQL and PSQL Cheat Sheet
 
+## Accessing the database
+
 ### Connect to psql
 ```shell
 psql -h localhost -p 5432 -U postgres
 ```
+
+To access the `gymroster` database directly, add the `-d gymroster` option.
+```shell
+psql -h localhost -p 5432 -U postgres -d gymroster
+
+```
+
+## PSQL commands
+Connect to psql to run the commands in this section. 
 
 ### List databases in instance
 ```text

@@ -34,7 +34,6 @@ The [src/main/resources/application.yml](../src/main/resources/application.yml) 
 | application-dev.yml   | Used for deploying to a cloud based dev environment.                                       |
 | application-prod.yml  | Used for deploying to a cloud-based production environment.                                |
 
-
 ## Running
 
 ### Environment Variables
@@ -61,12 +60,44 @@ or
 java -jar target/gym-roster.jar --spring.profiles.active=local
 ```
 
+The app will be accessible via http://localhost:8080. Do http://localhost:8080/actuator to test.
+
 To stop the server, issue a Control-C command in the shell where the service is running.
 
-### Running in Docker
-If running both the app and the database containers, then realize that containers have isolated networks unless explicitly linked or put on the same network. A docker compose should be used to start all the services at once.
+### Running in Docker locally
+If running both the app and the database containers, then realize that containers have isolated networks unless explicitly linked or put on the same network. 
+As a result, the `docker-compose` will allow both this app container and the database container to run in concert and communicate with each other.
 
-Build the app's Docker image: `docker build -t <image-name>:<image-tag> .`
+Using this docker compose option is good when doing local development on other services (i.e., a UI) that interfaces with this service and, thus, needs it to be running.
+
+#### Initiate docker compose
+
+```shell
+cd gym-roster
+docker compose up
+```
+
+If you want to run the app container in the background (i.e., detached mode) then use the `-d` flag.
+```shell
+docker compose up -d
+```
+
+#### Stop docker compose
+```shell
+docker compose down
+```
+
+#### Restart docker compose
+```shell
+docker compose start
+```
+
+The app will be accessible via http://localhost:8080. Do http://localhost:8080/actuator to test.
+
+### Building a standalone Docker app image
+> NOTE: Locally, your app container won't be able to communicate with the db image unless started via docker-compose. The information below is simply informational.
+
+To build the app's Docker image: `docker build -t <image-name>:<image-tag> .`
 
 For example:
 ```shell
@@ -96,29 +127,3 @@ To ping, go to http://127.0.0.1:8080/health, or in a terminal:
 ```shell
 curl http://localhost:8080/health
 ```
-
-## Accessing the database
-
-#### To view logs:
-```shell
-docker logs gym-roster-postgres
-```
-
-#### To connect to PostgreSQL inside the container:
-Access the container shell:
-```shell
-docker exec -it gym-roster-postgres bash
-```
-
-Use psql:
-```shell
-psql -U postgres
-```
-
-#### To connect to PostgreSQL outside of the container:
-```shell
-psql -h localhost -p 5432 -U postgres -d gymroster
-```
-
-#### References:
-* [How to Use the Postgres Docker Official Image](https://www.docker.com/blog/how-to-use-the-postgres-docker-official-image/)
