@@ -48,7 +48,7 @@ public class College extends BaseEntity {
     private String longName;
 
     @NotBlank(message = "City is required")
-    @Column(name = "city", nullable = false)
+    @Column(name = "city", nullable = false, length = 50)
     private String city;
 
     @NotNull(message = "State is required")
@@ -57,17 +57,17 @@ public class College extends BaseEntity {
     private State state;
 
     @NotNull(message = "Conference is required")
-    @Column(name = "conference", nullable = false, length = 20)
+    @Column(name = "conference_code", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Conference conference;
 
     @NotNull(message = "Division is required")
-    @Column(name = "division", nullable = false, length = 20)
+    @Column(name = "division_code", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Division division;
 
     @NotNull(message = "Region is required")
-    @Column(name = "region", nullable = false, length = 20)
+    @Column(name = "region_code", nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Region region;
 
