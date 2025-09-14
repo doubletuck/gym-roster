@@ -1,13 +1,13 @@
 # Local Development Environment
-This document provide steps for setting up a development environment for developing and running this module locally.
+This document provides steps for setting up a development environment for developing and running this module locally.
 
 ### Table of Contents
 * [Prerequisites](#prerequisites)
 * [Installing](#installing)
-* [Building](#building)
 * [Configuring](#configuring)
+* [Building](#building)
 * [Running](#running)
-* [Accessing the database](#accessing-the-database)
+* [Running in Docker locally](#running-in-docker-locally)
 
 ## Prerequisites
 
@@ -62,27 +62,76 @@ or
 java -jar target/gym-roster.jar --spring.profiles.active=local
 ```
 
+The app will be accessible via http://localhost:8080. Do http://localhost:8080/actuator to test.
+
 To stop the server, issue a Control-C command in the shell where the service is running.
 
-## Accessing the database
+## Running in Docker locally
+If running both the app and the database containers, then realize that containers have isolated networks unless explicitly linked or put on the same network. 
+As a result, the `docker-compose` will allow both this app container and the database container to run in concert and communicate with each other.
 
-#### To view logs:
+Using this docker compose option is good when doing local development on other services (i.e., a UI) that interfaces with this service and, thus, needs it to be running.
+
+#### Initiate docker compose
+
 ```shell
-docker logs gym-roster-postgres
+cd gym-roster
+docker compose up
 ```
 
-#### To connect to PostgreSQL outside of the container:
+If you need to rebuild the Docker image and start the container, then use the `-build` flag.
 ```shell
-psql -h localhost -p 5432 -U postgres -d gymroster
+mvn clean package -DskipTests
+docker compose up --build
 ```
 
-#### To connect to PostgreSQL inside the container:
-Access the container's shell:
+If you want to run the app container in the background (i.e., detached mode), then use the `-d` flag.
 ```shell
-docker exec -it gym-roster-postgres bash
+docker compose up -d
 ```
 
-Use the container's psql installation:
+#### Stop docker compose
 ```shell
-psql -U postgres
+docker compose down
+```
+
+#### Restart docker compose
+```shell
+docker compose start
+```
+
+The app will be accessible via http://localhost:8080. Do http://localhost:8080/actuator to test.
+
+### Building a standalone Docker app image
+> NOTE: Locally, your app container won't be able to communicate with the db image unless started via docker-compose. The information below is simply informational.
+
+To build the app's Docker image: `docker build -t <image-name>:<image-tag> .`
+
+For example:
+```shell
+docker build -t gym-roster:latest .
+```
+
+Run the Docker container.
+```shell
+docker run -d -p 8080:8080 gym-roster:latest
+```
+* `-d`: Runs the container in the background (detached mode).
+* `-p 8080:8080`: Maps port 8080 on your machine to port 8080 in the container (if your application uses that port).
+* `gym-roster:latest`: The image name and tag.
+
+
+Run the Docker container with the environment variable values needed to connect to the database in the relevant environment.
+```shell
+docker run \
+           -e DB_URL=jdbc:postgresql://localhost:5432/gymroster \
+           -e DB_USERNAME=postgres \
+           -e DB_PASSWORD=gympass \
+           -e SPRING_PROFILE_ACTIVE=local \
+           gym-roster:latest
+```
+
+To ping, go to http://127.0.0.1:8080/health, or in a terminal:
+```shell
+curl http://localhost:8080/health
 ```
