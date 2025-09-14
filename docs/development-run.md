@@ -79,7 +79,13 @@ cd gym-roster
 docker compose up
 ```
 
-If you want to run the app container in the background (i.e., detached mode) then use the `-d` flag.
+If you need to rebuild the Docker image and start the container, then use the `-build` flag.
+```shell
+mvn clean package -DskipTests
+docker compose up --build
+```
+
+If you want to run the app container in the background (i.e., detached mode), then use the `-d` flag.
 ```shell
 docker compose up -d
 ```
