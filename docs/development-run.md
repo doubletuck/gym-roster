@@ -103,35 +103,5 @@ docker compose start
 The app will be accessible via http://localhost:8080. Do http://localhost:8080/actuator to test.
 
 ### Building a standalone Docker app image
-> NOTE: Locally, your app container won't be able to communicate with the db image unless started via docker-compose. The information below is simply informational.
-
-To build the app's Docker image: `docker build -t <image-name>:<image-tag> .`
-
-For example:
-```shell
-docker build -t gym-roster:latest .
-```
-
-Run the Docker container.
-```shell
-docker run -d -p 8080:8080 gym-roster:latest
-```
-* `-d`: Runs the container in the background (detached mode).
-* `-p 8080:8080`: Maps port 8080 on your machine to port 8080 in the container (if your application uses that port).
-* `gym-roster:latest`: The image name and tag.
-
-
-Run the Docker container with the environment variable values needed to connect to the database in the relevant environment.
-```shell
-docker run \
-           -e DB_URL=jdbc:postgresql://localhost:5432/gymroster \
-           -e DB_USERNAME=postgres \
-           -e DB_PASSWORD=gympass \
-           -e SPRING_PROFILE_ACTIVE=local \
-           gym-roster:latest
-```
-
-To ping, go to http://127.0.0.1:8080/health, or in a terminal:
-```shell
-curl http://localhost:8080/health
-```
+Note that your app container won't be able to communicate with the database image locally unless started via docker-compose.
+But, for informational purposes, refer to [app-docker-configuration.md](app-docker-configuration.md) document for information on setting up an app docker container.

@@ -10,6 +10,8 @@ This document provides information for a developer to get their local developmen
 * [Install Docker](#install-docker)
 * [Install PostgreSQL](#install-postgresql)
 * [Install psql](#install-psql)
+* [Create database](#create-database)
+* [Initialize database](#initialize-database)
 
 ## Required Software
 * Homebrew - A package manager for installing software libraries and packages.
@@ -135,7 +137,7 @@ To connect to psql, run the command below. You will be prompted for your passwor
 psql -h localhost -p 5432 -U postgres
 ```
 
-## Create gymroster database
+## Create database
 
 First, connect to the PostgreSQL instance that was created (for example, using the psql instructions above).
 
@@ -143,3 +145,9 @@ Run the `create database <database-name>` command.
 ```text
 create database gymroster;
 ```
+
+## Initialize database
+The database schema is managed by [Flyway](https://github.com/flyway/flyway). Database migration scripts are stored in the [resources/db/migration](../src/main/resources/db/migration) directory. 
+When the application is started, Flyway will automatically create the schema and run the migration scripts in the correct order.
+
+You could also run it manually using `mvn flyway:migrate`. 

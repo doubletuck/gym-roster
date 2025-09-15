@@ -81,12 +81,8 @@ public class CollegeController {
     }
 
     @PostMapping("/file-import")
-    public ResponseEntity<List<CollegeImportResult>> importCollegesFromFile(@RequestParam MultipartFile file) {
-        try {
-            List<CollegeImportResult> collegeImportResults = collegeService.importCollegesFromFile(file);
-            return ResponseEntity.ok(collegeImportResults);
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<List<CollegeImportResult>> importCollegesFromFile(@RequestParam MultipartFile file) throws Exception {
+        List<CollegeImportResult> collegeImportResults = collegeService.importCollegesFromFile(file);
+        return ResponseEntity.ok(collegeImportResults);
     }
 }

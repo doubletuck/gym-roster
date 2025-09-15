@@ -47,14 +47,15 @@ public class CollegeService {
 
     /**
      * Saves the given college instance to the database. If any fields
-     * fail validation then a ValidationException is thrown. The returned
-     * college will contain fields that are updated by the system such
-     * as identifiers and last update timestamp.
+     * fail validation, then a ValidationException is thrown. The returned
+     * college object will also contain fields that are updated by the
+     * system.
      *
-     * @param college The college instance to save to the database.
+     * @param college The college instance that will be saved to the
+     * database.
      * @return The saved college instance with any updated fields.
-     * @throws ValidationException If college has validation constraint
-     * errors.
+     * @throws ValidationException If the college object has validation
+     * constraint errors.
      */
     public College save(College college) {
 
