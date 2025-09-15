@@ -17,7 +17,7 @@ CREATE TABLE athlete_roster (
     athlete_id BIGINT NOT NULL,
     college_id BIGINT NOT NULL,
     academic_year_code VARCHAR(20) NOT NULL,
-    event_code VARCHAR(20),
+    events VARCHAR(20),
     creation_timestamp TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     last_update_timestamp TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     CONSTRAINT uk_athlete_roster UNIQUE (season_year, college_id, athlete_id)

@@ -86,7 +86,7 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
                     roster.setSeasonYear(seasonYear);
                     roster.setAthlete(athlete);
                     roster.setAcademicYear(academicYear);
-                    roster.setEvent(event);
+                    roster.setEvents(event);
                     roster = athleteRosterService.save(roster);
                     currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.CREATED);
                     logger.info("AthleteRoster Import {} - Record {} - AthleteRoster created: {}", file.getName(), record.getRecordNumber(), roster);

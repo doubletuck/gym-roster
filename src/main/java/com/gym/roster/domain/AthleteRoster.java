@@ -1,7 +1,6 @@
 package com.gym.roster.domain;
 
 import com.doubletuck.gym.common.model.AcademicYear;
-import com.doubletuck.gym.common.model.Event;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
@@ -9,8 +8,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
-
-import java.time.Instant;
 
 /**
  * Represents a college women's gymnastics team roster for a given season.
@@ -47,18 +44,6 @@ public class AthleteRoster extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private AcademicYear academicYear;
 
-    @Column(name = "event_code", length = 20)
-    @Enumerated(EnumType.STRING)
-    private Event event;
-
-    public void setEvent(String event) {
-        if (event == null || event.trim().isEmpty()) {
-            this.event = null;
-            return;
-        }
-        this.event = Event.find(event);
-        if (this.event == null) {
-            throw new IllegalArgumentException("Event is invalid: " + event);
-        }
-    }
+    @Column(name = "events", length = 20)
+    private String events;
 }

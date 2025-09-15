@@ -31,13 +31,9 @@ public class AthleteRosterController {
     }
 
     @PostMapping("/file-import")
-    public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
-        try {
-            AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, athleteRosterService);
-            importer.parseFile(file);
-            return ResponseEntity.ok(importer.getImportResults());
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().build();
-        }
+    public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) throws Exception {
+        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, athleteRosterService);
+        importer.parseFile(file);
+        return ResponseEntity.ok(importer.getImportResults());
     }
 }
