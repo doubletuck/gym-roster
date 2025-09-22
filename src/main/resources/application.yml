@@ -27,3 +27,6 @@ spring:
       max-file-size: 10MB
       max-request-size: 10MB
 
+app:
+  cors:
+    allowed-origins: ${APP_CORS_ALLOWED-ORIGINS:http://localhost:3001}

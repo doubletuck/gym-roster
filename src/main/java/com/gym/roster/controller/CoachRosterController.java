@@ -1,6 +1,5 @@
 package com.gym.roster.controller;
 
-import com.gym.roster.domain.Coach;
 import com.gym.roster.domain.CoachRoster;
 import com.gym.roster.parser.CoachRosterCsvImporter;
 import com.gym.roster.parser.CoachRosterImportResult;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,7 +34,8 @@ public class CoachRosterController {
     private final CoachService coachService;
 
     @Autowired
-    public CoachRosterController(CoachRosterService coachRosterService, CollegeService collegeService, CoachService coachService) {
+    public CoachRosterController(CoachRosterService coachRosterService, CollegeService collegeService,
+            CoachService coachService) {
         this.coachRosterService = coachRosterService;
         this.collegeService = collegeService;
         this.coachService = coachService;
@@ -79,7 +78,8 @@ public class CoachRosterController {
     @PostMapping("/file-import")
     public ResponseEntity<List<CoachRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
         try {
-            CoachRosterCsvImporter importer = new CoachRosterCsvImporter(collegeService, coachService, coachRosterService);
+            CoachRosterCsvImporter importer = new CoachRosterCsvImporter(collegeService, coachService,
+                    coachRosterService);
             importer.parseFile(file);
             return ResponseEntity.ok(importer.getImportResults());
         } catch (Exception e) {

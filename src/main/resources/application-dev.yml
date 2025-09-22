@@ -1,0 +1,7 @@
+app:
+  cors:
+    allowed-origins: https://dev.yourapp.com,https://dev-admin.yourapp.com
+
+logging:
+  level:
+    com.gym: "DEBUG"
