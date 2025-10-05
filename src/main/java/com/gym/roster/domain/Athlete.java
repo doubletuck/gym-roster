@@ -15,6 +15,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.springframework.hateoas.server.core.Relation;
 
 @Getter
 @Setter
@@ -23,10 +24,9 @@ import lombok.ToString;
 @ToString
 @Entity
 @Table(name = "athlete", uniqueConstraints = {
-        @UniqueConstraint(
-                name = "uk_athlete",
-                columnNames = {"first_name", "last_name", "home_city"})
+        @UniqueConstraint(name = "uk_athlete", columnNames = { "first_name", "last_name", "home_city" })
 })
+@Relation(collectionRelation = "content")
 public class Athlete extends BaseEntity {
 
     @NotBlank(message = "First name is required")
