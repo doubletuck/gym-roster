@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -25,10 +28,12 @@ import java.util.UUID;
 public class AthleteController {
 
     private final AthleteService athleteService;
+    private final PagedResourcesAssembler<Athlete> pagedResourcesAssembler;
 
     @Autowired
-    public AthleteController(AthleteService athleteService) {
+    public AthleteController(AthleteService athleteService, PagedResourcesAssembler<Athlete> pagedResourcesAssembler) {
         this.athleteService = athleteService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @GetMapping("/{id}")
@@ -66,11 +71,11 @@ public class AthleteController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Athlete>> getPaginatedEntities(
+    public ResponseEntity<PagedModel<EntityModel<Athlete>>> getPaginatedEntities(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Athlete> athletes = athleteService.getPaginatedEntities(pageable);
-        return ResponseEntity.ok(athletes);
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(athletes));
     }
 }
