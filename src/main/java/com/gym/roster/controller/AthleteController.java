@@ -21,8 +21,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
-
 @RestController
 @RequestMapping("/athlete")
 public class AthleteController {
@@ -37,7 +35,7 @@ public class AthleteController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Athlete> findById(@PathVariable UUID id) {
+    public ResponseEntity<Athlete> findById(@PathVariable Long id) {
         return athleteService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -50,7 +48,7 @@ public class AthleteController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Athlete> update(@PathVariable UUID id, @RequestBody Athlete athlete) {
+    public ResponseEntity<Athlete> update(@PathVariable Long id, @RequestBody Athlete athlete) {
         return athleteService.findById(id)
                 .map(existingAthlete -> {
                     existingAthlete.setClubName(athlete.getClubName());
@@ -65,7 +63,7 @@ public class AthleteController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         athleteService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

@@ -9,7 +9,6 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AthleteService {
@@ -21,7 +20,7 @@ public class AthleteService {
         this.athleteRepository = athleteRepository;
     }
 
-    public Optional<Athlete> findById(UUID id) {
+    public Optional<Athlete> findById(Long id) {
         return athleteRepository.findById(id);
     }
 
@@ -38,7 +37,7 @@ public class AthleteService {
         return athleteRepository.save(athlete);
     }
 
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         athleteRepository.deleteById(id);
     }
 
