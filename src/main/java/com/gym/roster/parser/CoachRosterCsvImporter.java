@@ -46,6 +46,12 @@ public class CoachRosterCsvImporter extends AbstractRosterCsvImporter {
         return collegeService;
     }
 
+    boolean isValidRosterFileType(String fileName) {
+        boolean containsAthleteRoster = fileName != null && fileName.toLowerCase().contains("staff-roster");
+        boolean isCsv = fileName != null && fileName.toLowerCase().endsWith(".csv");
+        return containsAthleteRoster && isCsv;
+    }
+
     void parseFile() throws IOException {
         this.importResults.clear();
 

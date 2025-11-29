@@ -24,16 +24,28 @@ public class AthleteRosterController {
     private final CollegeService collegeService;
 
     @Autowired
-    public AthleteRosterController(AthleteRosterService athleteRosterService, CollegeService collegeService, AthleteService athleteService) {
+    public AthleteRosterController(AthleteRosterService athleteRosterService, CollegeService collegeService,
+            AthleteService athleteService) {
         this.athleteRosterService = athleteRosterService;
         this.collegeService = collegeService;
         this.athleteService = athleteService;
     }
 
     @PostMapping("/file-import")
-    public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) throws Exception {
-        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, athleteRosterService);
+    public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file)
+            throws Exception {
+        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService,
+                athleteRosterService);
         importer.parseFile(file);
         return ResponseEntity.ok(importer.getImportResults());
+    }
+
+    @PostMapping("/directory-import")
+    public ResponseEntity<Boolean> importRosterFromDirectory(@RequestParam String directoryPath)
+            throws Exception {
+        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService,
+                athleteRosterService);
+        importer.parseDirectory(directoryPath);
+        return ResponseEntity.ok(true);
     }
 }
