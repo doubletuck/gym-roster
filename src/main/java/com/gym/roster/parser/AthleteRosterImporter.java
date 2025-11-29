@@ -19,9 +19,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
+public class AthleteRosterImporter extends AbstractRosterImporter {
 
-    private final static Logger logger = LoggerFactory.getLogger(AthleteRosterCsvImporter.class);
+    private final static Logger logger = LoggerFactory.getLogger(AthleteRosterImporter.class);
 
     private final CollegeService collegeService;
     private final AthleteService athleteService;
@@ -31,7 +31,7 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
     private final List<AthleteRosterImportResult> importResults = new ArrayList<>();
     private AthleteRosterImportResult currentImportResult;
 
-    public AthleteRosterCsvImporter(CollegeService collegeService, AthleteService athleteService, AthleteRosterService athleteRosterService) {
+    public AthleteRosterImporter(CollegeService collegeService, AthleteService athleteService, AthleteRosterService athleteRosterService) {
         this.collegeService = collegeService;
         this.athleteService = athleteService;
         this.athleteRosterService = athleteRosterService;
@@ -72,7 +72,7 @@ public class AthleteRosterCsvImporter extends AbstractRosterCsvImporter {
                 currentImportResult = new AthleteRosterImportResult();
                 currentImportResult.setRecordNumber(record.getRecordNumber());
 
-                String collegeCodeName = record.get(CoachRosterCsvImporter.Headers.COLLEGE_CODE_NAME);
+                String collegeCodeName = record.get(CoachRosterImporter.Headers.COLLEGE_CODE_NAME);
                 College college = fetchCollege(collegeCodeName);
                 if (college == null) {
                     currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.ERROR);

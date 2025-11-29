@@ -19,9 +19,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoachRosterCsvImporter extends AbstractRosterCsvImporter {
+public class CoachRosterImporter extends AbstractRosterImporter {
 
-    private final static Logger logger = LoggerFactory.getLogger(CoachRosterCsvImporter.class);
+    private final static Logger logger = LoggerFactory.getLogger(CoachRosterImporter.class);
 
     private final CollegeService collegeService;
     private final CoachService coachService;
@@ -31,7 +31,7 @@ public class CoachRosterCsvImporter extends AbstractRosterCsvImporter {
     private final List<CoachRosterImportResult> importResults = new ArrayList<>();
     private CoachRosterImportResult currentImportResult;
 
-    public CoachRosterCsvImporter(CollegeService collegeService, CoachService coachService, CoachRosterService coachRosterService) {
+    public CoachRosterImporter(CollegeService collegeService, CoachService coachService, CoachRosterService coachRosterService) {
         this.collegeService = collegeService;
         this.coachService = coachService;
         this.coachRosterService = coachRosterService;

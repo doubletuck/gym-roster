@@ -1,7 +1,7 @@
 package com.gym.roster.controller;
 
 import com.gym.roster.domain.CoachRoster;
-import com.gym.roster.parser.CoachRosterCsvImporter;
+import com.gym.roster.parser.CoachRosterImporter;
 import com.gym.roster.parser.CoachRosterImportResult;
 import com.gym.roster.service.CoachRosterService;
 import com.gym.roster.service.CoachService;
@@ -78,7 +78,7 @@ public class CoachRosterController {
     @PostMapping("/file-import")
     public ResponseEntity<List<CoachRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
         try {
-            CoachRosterCsvImporter importer = new CoachRosterCsvImporter(collegeService, coachService,
+            CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService,
                     coachRosterService);
             importer.parseFile(file);
             return ResponseEntity.ok(importer.getImportResults());

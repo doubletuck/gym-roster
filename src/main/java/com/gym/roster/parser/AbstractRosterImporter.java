@@ -15,9 +15,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class AbstractRosterCsvImporter {
+public abstract class AbstractRosterImporter {
 
-    private final static Logger logger = LoggerFactory.getLogger(AbstractRosterCsvImporter.class);
+    private final static Logger logger = LoggerFactory.getLogger(AbstractRosterImporter.class);
     final Map<String, College> collegeMap = new HashMap<>();
     File file;
 
@@ -39,7 +39,7 @@ public abstract class AbstractRosterCsvImporter {
                                 parseFile(filePath.toFile());
                             } else {
                                 logger.debug(
-                                        "Skipping the import for '{}'. The file is not considered to be a roster import file.",
+                                        "Skipping the import for '{}' because it is not considered the right roster import file.",
                                         filePath.getFileName());
                             }
                         } catch (IOException e) {

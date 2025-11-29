@@ -1,6 +1,6 @@
 package com.gym.roster.controller;
 
-import com.gym.roster.parser.AthleteRosterCsvImporter;
+import com.gym.roster.parser.AthleteRosterImporter;
 import com.gym.roster.parser.AthleteRosterImportResult;
 import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
@@ -34,7 +34,7 @@ public class AthleteRosterController {
     @PostMapping("/file-import")
     public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file)
             throws Exception {
-        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService,
+        AthleteRosterImporter importer = new AthleteRosterImporter(collegeService, athleteService,
                 athleteRosterService);
         importer.parseFile(file);
         return ResponseEntity.ok(importer.getImportResults());
@@ -43,7 +43,7 @@ public class AthleteRosterController {
     @PostMapping("/directory-import")
     public ResponseEntity<Boolean> importRosterFromDirectory(@RequestParam String directoryPath)
             throws Exception {
-        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService,
+        AthleteRosterImporter importer = new AthleteRosterImporter(collegeService, athleteService,
                 athleteRosterService);
         importer.parseDirectory(directoryPath);
         return ResponseEntity.ok(true);

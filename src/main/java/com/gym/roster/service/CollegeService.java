@@ -2,7 +2,7 @@ package com.gym.roster.service;
 
 import com.gym.roster.domain.College;
 import com.gym.roster.exception.ValidationException;
-import com.gym.roster.parser.CollegeCsvImporter;
+import com.gym.roster.parser.CollegeImporter;
 import com.gym.roster.parser.CollegeImportResult;
 import com.gym.roster.repository.CollegeRepository;
 import jakarta.validation.ConstraintViolation;
@@ -83,7 +83,7 @@ public class CollegeService {
     public List<CollegeImportResult> importCollegesFromFile(MultipartFile multipartFile) throws Exception {
 
         logger.info("Initiating the import of college data from an uploaded file.");
-        List<College> fileColleges = CollegeCsvImporter.parseFile(multipartFile);
+        List<College> fileColleges = CollegeImporter.parseFile(multipartFile);
         logger.info("College data was parsed from the uploaded file. Total colleges parsed: {}.", fileColleges.size());
 
         ArrayList<CollegeImportResult> collegeImportResults = new ArrayList<>();

@@ -8,6 +8,7 @@ public class CollegeImportResult {
 
     public enum Status {
         CREATED,
+        UPDATED,
         EXISTS,
         ERROR;
     }
