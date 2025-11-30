@@ -2,6 +2,9 @@ package com.gym.roster.parser;
 
 import com.gym.roster.domain.College;
 import com.gym.roster.service.CollegeService;
+
+import lombok.Getter;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
@@ -11,14 +14,20 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class AbstractRosterImporter {
+public abstract class AbstractRosterImporter<T extends ImportResult> {
 
     private final static Logger logger = LoggerFactory.getLogger(AbstractRosterImporter.class);
     final Map<String, College> collegeMap = new HashMap<>();
+
+    @Getter
+    final List<T> importResults = new ArrayList<>();
+
     File file;
 
     public void parseDirectory(String directoryPath) throws IOException {
@@ -39,7 +48,7 @@ public abstract class AbstractRosterImporter {
                                 parseFile(filePath.toFile());
                             } else {
                                 logger.debug(
-                                        "Skipping the import for '{}' because it is not considered the right roster import file.",
+                                        "Skipping import for '{}' because it is not considered a valid file for this type of roster import.",
                                         filePath.getFileName());
                             }
                         } catch (IOException e) {
@@ -73,7 +82,7 @@ public abstract class AbstractRosterImporter {
 
     abstract boolean isValidRosterFileType(String fileName);
 
-    abstract void parseFile() throws IOException;
+    abstract List<T> parseFile() throws IOException;
 
     abstract CollegeService getCollegeService();
 

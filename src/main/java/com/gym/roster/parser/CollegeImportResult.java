@@ -4,17 +4,10 @@ import com.gym.roster.domain.College;
 import lombok.Data;
 
 @Data
-public class CollegeImportResult {
-
-    public enum Status {
-        CREATED,
-        UPDATED,
-        EXISTS,
-        ERROR;
-    }
+public class CollegeImportResult implements ImportResult {
 
     private String collegeCodeName;
-    private Status importStatus;
+    private ImportResultStatus importStatus;
     private College college;
     private String message;
 }

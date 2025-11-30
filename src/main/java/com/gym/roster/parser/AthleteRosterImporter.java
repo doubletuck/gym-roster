@@ -7,7 +7,6 @@ import com.gym.roster.domain.AthleteRoster;
 import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
 import com.gym.roster.service.AthleteRosterService;
-import lombok.Getter;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
@@ -16,10 +15,9 @@ import org.slf4j.LoggerFactory;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
-import java.util.ArrayList;
 import java.util.List;
 
-public class AthleteRosterImporter extends AbstractRosterImporter {
+public class AthleteRosterImporter extends AbstractRosterImporter<AthleteRosterImportResult> {
 
     private final static Logger logger = LoggerFactory.getLogger(AthleteRosterImporter.class);
 
@@ -27,8 +25,6 @@ public class AthleteRosterImporter extends AbstractRosterImporter {
     private final AthleteService athleteService;
     private final AthleteRosterService athleteRosterService;
 
-    @Getter
-    private final List<AthleteRosterImportResult> importResults = new ArrayList<>();
     private AthleteRosterImportResult currentImportResult;
 
     public AthleteRosterImporter(CollegeService collegeService, AthleteService athleteService, AthleteRosterService athleteRosterService) {
@@ -54,7 +50,7 @@ public class AthleteRosterImporter extends AbstractRosterImporter {
         return containsAthleteRoster && isCsv;
     }
 
-    void parseFile() throws IOException {
+    List<AthleteRosterImportResult> parseFile() throws IOException {
         this.importResults.clear();
 
         try {
@@ -75,7 +71,7 @@ public class AthleteRosterImporter extends AbstractRosterImporter {
                 String collegeCodeName = record.get(CoachRosterImporter.Headers.COLLEGE_CODE_NAME);
                 College college = fetchCollege(collegeCodeName);
                 if (college == null) {
-                    currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.ERROR);
+                    currentImportResult.setRosterImportStatus(ImportResultStatus.ERROR);
                     currentImportResult.setMessage("College name given in the file is not valid or is not supported: " + collegeCodeName + ".");
                     continue;
                 }
@@ -94,10 +90,10 @@ public class AthleteRosterImporter extends AbstractRosterImporter {
                     roster.setAcademicYear(academicYear);
                     roster.setEvents(event);
                     roster = athleteRosterService.save(roster);
-                    currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.CREATED);
+                    currentImportResult.setRosterImportStatus(ImportResultStatus.CREATED);
                     logger.info("AthleteRoster Import {} - Record {} - AthleteRoster created: {}", file.getName(), record.getRecordNumber(), roster);
                 } else {
-                    currentImportResult.setRosterImportStatus(AthleteRosterImportResult.Status.EXISTS);
+                    currentImportResult.setRosterImportStatus(ImportResultStatus.EXISTS);
                     logger.info("AthleteRoster Import {} - Record {} - AthleteRoster exists: {}", file.getName(), record.getRecordNumber(), roster);
                 }
 
@@ -106,9 +102,11 @@ public class AthleteRosterImporter extends AbstractRosterImporter {
             }
             logger.info("AthleteRoster Import {} - File processing completed.", file.getName());
         } catch (IOException e) {
-            logger.error("An error occurred while parsing the athlete roster CSV file '{}': {}", file.getAbsoluteFile(), e.getMessage());
+            logger.error("An error occurred while parsing the athlete roster CSV file '{}': {}", file.getAbsoluteFile(),
+                    e.getMessage());
             throw e;
         }
+        return this.importResults;
     }
 
     private Athlete fetchAthlete(CSVRecord record) {
@@ -131,16 +129,16 @@ public class AthleteRosterImporter extends AbstractRosterImporter {
             athlete.setHomeCountry(homeCountry);
             athlete.setClubName(clubName);
             athlete = athleteService.save(athlete);
-            currentImportResult.setAthleteImportStatus(AthleteRosterImportResult.Status.CREATED);
+            currentImportResult.setAthleteImportStatus(ImportResultStatus.CREATED);
             logger.info("AthleteRoster Import {} - Record {} - Athlete created: {}.", file.getName(), record.getRecordNumber(), athlete);
         } else {
             if (athlete.getClubName() == null && clubName != null) {
                 athlete.setClubName(clubName);
                 athleteService.save(athlete);
-                currentImportResult.setAthleteImportStatus(AthleteRosterImportResult.Status.UPDATED);
+                currentImportResult.setAthleteImportStatus(ImportResultStatus.UPDATED);
                 logger.info("AthleteRoster Import {} - Record {} - Athlete updated: {}.", file.getName(), record.getRecordNumber(), athlete);
             } else {
-                currentImportResult.setAthleteImportStatus(AthleteRosterImportResult.Status.EXISTS);
+                currentImportResult.setAthleteImportStatus(ImportResultStatus.EXISTS);
                 logger.info("AthleteRoster Import {} - Record {} - Athlete exists: {}.", file.getName(), record.getRecordNumber(), athlete);
             }
         }

@@ -4,18 +4,11 @@ import com.gym.roster.domain.AthleteRoster;
 import lombok.Data;
 
 @Data
-public class AthleteRosterImportResult {
-
-    public enum Status {
-        CREATED,
-        UPDATED,
-        EXISTS,
-        ERROR;
-    }
+public class AthleteRosterImportResult implements ImportResult {
 
     private Long recordNumber;
-    private Status athleteImportStatus;
-    private Status rosterImportStatus;
+    private ImportResultStatus athleteImportStatus;
+    private ImportResultStatus rosterImportStatus;
     private AthleteRoster roster;
     private String message;
 }
