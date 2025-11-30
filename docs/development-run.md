@@ -34,14 +34,16 @@ Prior to running the application, you will need to have the database started. Re
 
 The database schema will automatically be created using Flyway when the application is started as described in the [Running](#running) section. The [database/migration](../src/main/resources/db/migration) directory contains the scripts for establishing the schema.
 
-Optional: If you want to start with a clean database, then running the following command will drop all objects in the database and recreate the schema according to the migration scripts.
+### Optional: Clear database
+If you want to start with a clean database, then running the following command will drop all schema objects in the database.
 ```shell
- mvn flyway:clean \
-   -Dspring.profiles.active=local \ 
-   -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster \
-   -Dflyway.user=postgres \
-   -Dflyway.password=gympass \
-   -Dflyway.cleanDisabled=false
+ mvn flyway:clean -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster -Dflyway.user=postgres -Dflyway.password=gympass -Dflyway.cleanDisabled=false
+```
+
+### Optional: Run migration
+After clearing the database, run the migration script(s).
+```shell
+mvn flyway:migrate -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster -Dflyway.user=postgres -Dflyway.password=gympass
 ```
 
 ## Building

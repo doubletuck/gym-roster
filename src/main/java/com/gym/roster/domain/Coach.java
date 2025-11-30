@@ -26,12 +26,12 @@ import lombok.ToString;
 public class Coach extends BaseEntity {
 
     @NotBlank(message = "First name is required")
-    @Size(max = 30, message = "First name must have 30 or fewer characters")
-    @Column(name = "first_name", nullable = false, length = 30)
+    @Size(max = 40, message = "First name must have 40 or fewer characters")
+    @Column(name = "first_name", nullable = false, length = 40)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(max = 30, message = "Last name must have 30 or fewer characters")
-    @Column(name = "last_name", nullable = false, length = 30)
+    @Size(max = 40, message = "Last name must have 40 or fewer characters")
+    @Column(name = "last_name", nullable = false, length = 40)
     private String lastName;
 }

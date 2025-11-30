@@ -30,17 +30,17 @@ import org.springframework.hateoas.server.core.Relation;
 public class Athlete extends BaseEntity {
 
     @NotBlank(message = "First name is required")
-    @Size(max = 30, message = "First name must have 30 or fewer characters")
-    @Column(name = "first_name", nullable = false, length = 30)
+    @Size(max = 40, message = "First name must have 40 or fewer characters")
+    @Column(name = "first_name", nullable = false, length = 40)
     private String firstName;
 
     @NotBlank(message = "Last name is required")
-    @Size(max = 30, message = "Last name must have 30 or fewer characters")
-    @Column(name = "last_name", nullable = false, length = 30)
+    @Size(max = 40, message = "Last name must have 40 or fewer characters")
+    @Column(name = "last_name", nullable = false, length = 40)
     private String lastName;
 
     @NotBlank(message = "Home city is required")
-    @Size(max = 30, message = "Home city must have 50 or fewer characters")
+    @Size(max = 50, message = "Home city must have 50 or fewer characters")
     @Column(name = "home_city", nullable = false, length = 50)
     private String homeCity;
 
@@ -52,7 +52,8 @@ public class Athlete extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Country homeCountry;
 
-    @Column(name = "club_name", length = 50)
+    @Column(name = "club_name", length = 100)
+    @Size(max = 100, message = "Club name must have 100 or fewer characters")
     private String clubName;
 
     public void setFirstName(String firstName) {
