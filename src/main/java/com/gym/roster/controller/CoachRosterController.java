@@ -80,8 +80,21 @@ public class CoachRosterController {
         try {
             CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService,
                     coachRosterService);
-            importer.parseFile(file);
-            return ResponseEntity.ok(importer.getImportResults());
+            List<CoachRosterImportResult> results =importer.parseFile(file);
+            return ResponseEntity.ok(results);
+        } catch (Exception e) {
+            logger.error("Error importing coach roster file: {}", e.getMessage(), e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @PostMapping("/directory-import")
+    public ResponseEntity<Boolean> importRosterFromDirectory(@RequestParam String directoryPath) {
+        try {
+            CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService,
+                    coachRosterService);
+            importer.parseDirectory(directoryPath);
+            return ResponseEntity.ok(true);
         } catch (Exception e) {
             logger.error("Error importing coach roster file: {}", e.getMessage(), e);
             return ResponseEntity.internalServerError().build();

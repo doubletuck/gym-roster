@@ -36,8 +36,8 @@ public class AthleteRosterController {
             throws Exception {
         AthleteRosterImporter importer = new AthleteRosterImporter(collegeService, athleteService,
                 athleteRosterService);
-        importer.parseFile(file);
-        return ResponseEntity.ok(importer.getImportResults());
+        List<AthleteRosterImportResult> results = importer.parseFile(file);
+        return ResponseEntity.ok(results);
     }
 
     @PostMapping("/directory-import")

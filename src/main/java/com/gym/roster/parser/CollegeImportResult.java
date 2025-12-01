@@ -10,4 +10,8 @@ public class CollegeImportResult implements ImportResult {
     private ImportResultStatus importStatus;
     private College college;
     private String message;
+
+    public boolean hasErrorStatus() {
+        return importStatus == ImportResultStatus.ERROR;
+    }
 }

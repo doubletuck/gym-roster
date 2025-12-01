@@ -11,4 +11,9 @@ public class AthleteRosterImportResult implements ImportResult {
     private ImportResultStatus rosterImportStatus;
     private AthleteRoster roster;
     private String message;
+
+    public boolean hasErrorStatus() {
+        return (athleteImportStatus == ImportResultStatus.ERROR ||
+                rosterImportStatus == ImportResultStatus.ERROR);
+    }
 }

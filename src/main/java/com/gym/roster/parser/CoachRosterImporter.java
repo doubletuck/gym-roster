@@ -12,9 +12,11 @@ import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.io.Reader;
+import java.util.ArrayList;
 import java.util.List;
 
 public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImportResult> {
@@ -25,7 +27,9 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
     private final CoachService coachService;
     private final CoachRosterService coachRosterService;
 
+    private File file;
     private CoachRosterImportResult currentImportResult;
+    private final List<CoachRosterImportResult> importResults = new ArrayList<>();
 
     public CoachRosterImporter(CollegeService collegeService, CoachService coachService, CoachRosterService coachRosterService) {
         this.collegeService = collegeService;
@@ -48,7 +52,12 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
         return containsAthleteRoster && isCsv;
     }
 
-    List<CoachRosterImportResult> parseFile() throws IOException {
+    List<CoachRosterImportResult> parseFile(File file) throws IOException {
+        if (file == null) {
+            throw new IllegalArgumentException("File cannot be null.");
+        }
+        this.file = file;
+        this.currentImportResult = null;
         this.importResults.clear();
 
         try {
@@ -70,13 +79,20 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
                 College college = fetchCollege(collegeCodeName);
                 if (college == null) {
                     currentImportResult.setRosterImportStatus(ImportResultStatus.ERROR);
-                    currentImportResult.setMessage("College name given in the file is not valid or is not supported: " + collegeCodeName + ".");
+                    currentImportResult.setMessage(String.format("College name given in the file is not valid or is not supported: %s.", collegeCodeName));
+                    importResults.add(currentImportResult);
                     continue;
                 }
 
                 Short seasonYear = Short.parseShort(record.get(Headers.YEAR));
-                Coach coach = fetchCoach(record);
                 StaffRole role = StaffRole.valueOf(record.get(Headers.ROLE));
+                Coach coach = fetchCoach(record);
+                if (coach == null) {
+                    currentImportResult.setRosterImportStatus(ImportResultStatus.ERROR);
+                    currentImportResult.setMessage(String.format("Coach given in the file is not valid: %s %s.",
+                            record.get(Headers.FIRST_NAME), record.get(Headers.LAST_NAME)));
+                    continue;
+                }
 
                 CoachRoster roster = coachRosterService.findByYearAndCollegeAndCoach(seasonYear, college, coach);
                 if (roster == null) {
@@ -85,9 +101,17 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
                     roster.setSeasonYear(seasonYear);
                     roster.setCoach(coach);
                     roster.setRoleCode(role);
-                    roster = coachRosterService.save(roster);
-                    currentImportResult.setRosterImportStatus(ImportResultStatus.CREATED);
-                    logger.info("CoachRoster Import {} - Record {} - CoachRoster created: {}", file.getName(), record.getRecordNumber(), roster);
+                    try {
+                        roster = coachRosterService.save(roster);
+                        currentImportResult.setRosterImportStatus(ImportResultStatus.CREATED);
+                        logger.info("CoachRoster Import {} - Record {} - CoachRoster created: {}", file.getName(), record.getRecordNumber(), roster);
+                    } catch (Exception e) {
+                        currentImportResult.setRosterImportStatus(ImportResultStatus.ERROR);
+                        currentImportResult.setMessage("Error creating CoachRoster: " + e.getMessage());
+                        logger.error("CoachRoster Import {} - Record {} - CoachRoster creation failed: {}",
+                                file.getName(), record.getRecordNumber(), roster, e.getMessage());
+                        continue;
+                    }
                 } else {
                     currentImportResult.setRosterImportStatus(ImportResultStatus.EXISTS);
                     logger.info("CoachRoster Import {} - Record {} - CoachRoster exists: {}", file.getName(), record.getRecordNumber(), roster);
@@ -116,9 +140,18 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
             coach = new Coach();
             coach.setFirstName(firstName);
             coach.setLastName(lastName);
-            coach = coachService.save(coach);
-            currentImportResult.setCoachImportStatus(ImportResultStatus.CREATED);
-            logger.info("CoachRoster Import {} - Record {} - Coach created: {}.", file.getName(), record.getRecordNumber(), coach);
+            try {
+                coach = coachService.save(coach);
+                currentImportResult.setCoachImportStatus(ImportResultStatus.CREATED);
+                logger.info("CoachRoster Import {} - Record {} - Coach created: {}.", file.getName(), record.getRecordNumber(), coach);
+                logger.info("CoachRoster Import {} - Record {} - Created new Coach: {}.", file.getName(), record.getRecordNumber(), coach);
+            } catch (Exception e) {
+                currentImportResult.setCoachImportStatus(ImportResultStatus.ERROR);
+                currentImportResult.setMessage("Error creating new Coach: " + e.getMessage());
+                logger.error("CoachRoster Import {} - Record {} - Error creating new Coach: {}. Error: {}", file.getName(),
+                        record.getRecordNumber(), coach, e.getMessage());
+                return null;
+            }
         } else {
             currentImportResult.setCoachImportStatus(ImportResultStatus.EXISTS);
             logger.info("CoachRoster Import {} - Record {} - Coach exists: {}.", file.getName(), record.getRecordNumber(), coach);

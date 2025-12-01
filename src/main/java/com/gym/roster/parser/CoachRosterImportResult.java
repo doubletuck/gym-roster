@@ -11,4 +11,9 @@ public class CoachRosterImportResult implements ImportResult {
     private ImportResultStatus rosterImportStatus;
     private CoachRoster roster;
     private String message;
+
+    public boolean hasErrorStatus() {
+        return (coachImportStatus == ImportResultStatus.ERROR ||
+                rosterImportStatus == ImportResultStatus.ERROR);
+    }
 }
