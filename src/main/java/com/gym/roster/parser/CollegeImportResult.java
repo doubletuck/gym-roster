@@ -7,7 +7,7 @@ import lombok.Data;
 public class CollegeImportResult implements ImportResult {
 
     private String collegeCodeName;
-    private ImportResultStatus importStatus;
+    private ImportResultStatus importStatus = ImportResultStatus.UNPROCESSED;
     private College college;
     private String message;
 

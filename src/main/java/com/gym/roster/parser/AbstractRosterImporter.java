@@ -23,6 +23,7 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
     final Map<String, College> collegeMap = new HashMap<>();
     
     long importFilesTotalCount = 0;
+    long importFilesProcessedCount = 0;
     long importFilesSkippedCount = 0;
     long importRecordsTotalCount = 0;
     long importRecordsErrorCount = 0;
@@ -39,6 +40,7 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
         }
 
         logger.info("Directory Import {} - Starting", directoryPath);
+        resetCounts();
 
         try (Stream<Path> paths = Files.walk(path)) {
             paths.filter(Files::isRegularFile)
@@ -46,6 +48,7 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
                         importFilesTotalCount++;
                         try {
                             if (isValidRosterFileType(filePath.getFileName().toString())) {
+                                importFilesProcessedCount++;
                                 List<T> results = parseFile(filePath.toFile());
                                 appendCounts(results);
                             } else {
@@ -60,7 +63,8 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
                     });
         }
 
-        logger.info("Directory Import {} - Total files processed: {}.", directoryPath, importFilesTotalCount);
+        logger.info("Directory Import {} - Total files in directory: {}.", directoryPath, importFilesTotalCount);
+        logger.info("Directory Import {} - Total files processed: {}.", directoryPath, importFilesProcessedCount);
         logger.info("Directory Import {} - Total files skipped: {}.", directoryPath, importFilesSkippedCount);
         logger.info("Directory Import {} - Total records processed: {}.", directoryPath, importRecordsTotalCount);
         logger.info("Directory Import {} - Total records with errors: {}.", directoryPath, importRecordsErrorCount);
@@ -87,6 +91,15 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
 
     abstract CollegeService getCollegeService();
 
+    /**
+     * Given a college code, fetch the corresponding college object. If the college
+     * code is empty or null, or if no corresponding college is found, then a null
+     * value is returned.
+     * 
+     * @param collegeCodeName The code name of the college to fetch.
+     * @return The college object corresponding to the code name. Or, null if no
+     * matching college is found.
+     */
     College fetchCollege(String collegeCodeName) {
         if (collegeCodeName == null || collegeCodeName.isEmpty()) {
             return null;
@@ -111,5 +124,12 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
                 importRecordsErrorCount++;
             }
         }
+    }
+
+    private void resetCounts() {
+        importFilesSkippedCount = 0;
+        importFilesTotalCount = 0;
+        importRecordsErrorCount = 0;
+        importRecordsTotalCount = 0;
     }
 }

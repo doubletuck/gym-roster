@@ -7,8 +7,8 @@ import lombok.Data;
 public class CoachRosterImportResult implements ImportResult {
 
     private Long recordNumber;
-    private ImportResultStatus coachImportStatus;
-    private ImportResultStatus rosterImportStatus;
+    private ImportResultStatus coachImportStatus = ImportResultStatus.UNPROCESSED;
+    private ImportResultStatus rosterImportStatus = ImportResultStatus.UNPROCESSED;
     private CoachRoster roster;
     private String message;
 
