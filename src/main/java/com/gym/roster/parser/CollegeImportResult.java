@@ -6,6 +6,8 @@ import lombok.Data;
 @Data
 public class CollegeImportResult implements ImportResult {
 
+    private String fileName;
+    private Long recordNumber;
     private String collegeCodeName;
     private ImportResultStatus importStatus = ImportResultStatus.UNPROCESSED;
     private College college;

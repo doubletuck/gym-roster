@@ -73,6 +73,7 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
             for (CSVRecord record : records) {
                 logger.info("CoachRoster Import {} - Record {} - Processing file record: {}", file.getName(), record.getRecordNumber(), record);
                 currentImportResult = new CoachRosterImportResult();
+                currentImportResult.setFileName(file.getName());
                 currentImportResult.setRecordNumber(record.getRecordNumber());
 
                 String collegeCodeName = record.get(Headers.COLLEGE_CODE_NAME);

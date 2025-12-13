@@ -1,6 +1,7 @@
 package com.gym.roster.parser;
 
 import com.doubletuck.gym.common.model.AcademicYear;
+import com.doubletuck.gym.common.model.Country;
 import com.gym.roster.domain.Athlete;
 import com.gym.roster.domain.College;
 import com.gym.roster.domain.AthleteRoster;
@@ -77,6 +78,7 @@ public class AthleteRosterImporter extends AbstractRosterImporter<AthleteRosterI
                 logger.info("AthleteRoster Import {} - Record {} - Processing file record: {}", file.getName(),
                         record.getRecordNumber(), record);
                 currentImportResult = new AthleteRosterImportResult();
+                currentImportResult.setFileName(file.getName());
                 currentImportResult.setRecordNumber(record.getRecordNumber());
 
                 String collegeCodeName = record.get(CoachRosterImporter.Headers.COLLEGE_CODE_NAME);
@@ -115,18 +117,21 @@ public class AthleteRosterImporter extends AbstractRosterImporter<AthleteRosterI
         String homeState = record.get(Headers.HOME_STATE).isBlank() ? null : record.get(Headers.HOME_STATE);
         String homeCountry = record.get(Headers.HOME_COUNTRY).isBlank() ? null : record.get(Headers.HOME_COUNTRY);
         String clubName = record.get(Headers.CLUB).isBlank() ? null : record.get(Headers.CLUB);
-
+        
         Athlete athlete = athleteService.findByNameAndHomeCity(firstName, lastName, homeCity);
-
+        
         if (athlete == null) {
-            athlete = new Athlete();
-            athlete.setFirstName(firstName);
-            athlete.setLastName(lastName);
-            athlete.setHomeCity(homeCity);
-            athlete.setHomeState(homeState);
-            athlete.setHomeCountry(homeCountry);
-            athlete.setClubName(clubName);
             try {
+                athlete = new Athlete();
+                athlete.setFirstName(firstName);
+                athlete.setLastName(lastName);
+                athlete.setHomeCity(homeCity);
+                athlete.setHomeState(homeState);
+                athlete.setClubName(clubName);
+                // Using "valueOf" instead of "find" so that an exception is thrown if the country string value is not valid
+                Country country = (homeCountry == null) ? null : Country.valueOf(homeCountry);
+                athlete.setHomeCountry(country);
+
                 athlete = athleteService.save(athlete);
                 currentImportResult.setAthleteImportStatus(ImportResultStatus.CREATED);
                 logger.info("AthleteRoster Import {} - Record {} - Athlete created: {}.", file.getName(),
@@ -134,8 +139,8 @@ public class AthleteRosterImporter extends AbstractRosterImporter<AthleteRosterI
             } catch (Exception e) {
                 currentImportResult.setAthleteImportStatus(ImportResultStatus.ERROR);
                 currentImportResult.setMessage("Error creating Athlete: " + e.getMessage());
-                logger.error("AthleteRoster Import {} - Record {} - Athlete creation failed: {}",
-                        file.getName(), record.getRecordNumber(), athlete, e.getMessage());
+                logger.error("AthleteRoster Import {} - Record {} - Athlete creation failed: {} - Error: {}",
+                                file.getName(), record.getRecordNumber(), athlete, e.getMessage());
                 return null;
             }
         } else {

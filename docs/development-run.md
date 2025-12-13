@@ -37,7 +37,7 @@ The database schema will automatically be created using Flyway when the applicat
 ### Optional: Clear database
 If you want to start with a clean database, then running the following command will drop all schema objects in the database.
 ```shell
- mvn flyway:clean -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster -Dflyway.user=postgres -Dflyway.password=gympass -Dflyway.cleanDisabled=false
+mvn flyway:clean -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster -Dflyway.user=postgres -Dflyway.password=gympass -Dflyway.cleanDisabled=false
 ```
 
 ### Optional: Run migration

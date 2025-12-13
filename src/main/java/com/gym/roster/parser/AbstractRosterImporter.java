@@ -12,6 +12,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +28,7 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
     long importFilesSkippedCount = 0;
     long importRecordsTotalCount = 0;
     long importRecordsErrorCount = 0;
+    List<T> errorResults = new ArrayList<>();
 
     public void parseDirectory(String directoryPath) throws IOException {
         if (directoryPath == null || directoryPath.isEmpty()) {
@@ -63,11 +65,17 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
                     });
         }
 
-        logger.info("Directory Import {} - Total files in directory: {}.", directoryPath, importFilesTotalCount);
-        logger.info("Directory Import {} - Total files processed: {}.", directoryPath, importFilesProcessedCount);
-        logger.info("Directory Import {} - Total files skipped: {}.", directoryPath, importFilesSkippedCount);
-        logger.info("Directory Import {} - Total records processed: {}.", directoryPath, importRecordsTotalCount);
-        logger.info("Directory Import {} - Total records with errors: {}.", directoryPath, importRecordsErrorCount);
+        int errorCount = 1;
+        for (T errorResult : errorResults) {
+            logger.info("Directory Import {} - Error {}/{}: File {} at record {} - Message: {}",
+                            directoryPath, errorCount++, errorResults.size(),
+                            errorResult.getFileName(), errorResult.getRecordNumber(), errorResult.getMessage());
+        }
+        logger.info("Directory Import {} - Total files in directory: {}", directoryPath, importFilesTotalCount);
+        logger.info("Directory Import {} - Total files processed: {}", directoryPath, importFilesProcessedCount);
+        logger.info("Directory Import {} - Total files skipped: {}", directoryPath, importFilesSkippedCount);
+        logger.info("Directory Import {} - Total records processed: {}", directoryPath, importRecordsTotalCount);
+        logger.info("Directory Import {} - Total records with errors: {}", directoryPath, importRecordsErrorCount);
     }
 
     public List<T> parseFile(MultipartFile multipartFile) throws IOException {
@@ -122,6 +130,7 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
         for (T result : importResults) {
             if (result.hasErrorStatus()) {
                 importRecordsErrorCount++;
+                errorResults.add(result);
             }
         }
     }
@@ -131,5 +140,6 @@ public abstract class AbstractRosterImporter<T extends ImportResult> {
         importFilesTotalCount = 0;
         importRecordsErrorCount = 0;
         importRecordsTotalCount = 0;
+        errorResults.clear();
     }
 }

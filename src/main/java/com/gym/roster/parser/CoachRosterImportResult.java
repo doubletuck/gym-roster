@@ -6,6 +6,7 @@ import lombok.Data;
 @Data
 public class CoachRosterImportResult implements ImportResult {
 
+    private String fileName;
     private Long recordNumber;
     private ImportResultStatus coachImportStatus = ImportResultStatus.UNPROCESSED;
     private ImportResultStatus rosterImportStatus = ImportResultStatus.UNPROCESSED;
