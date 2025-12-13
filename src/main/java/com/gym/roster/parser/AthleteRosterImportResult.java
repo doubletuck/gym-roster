@@ -4,18 +4,17 @@ import com.gym.roster.domain.AthleteRoster;
 import lombok.Data;
 
 @Data
-public class AthleteRosterImportResult {
+public class AthleteRosterImportResult implements ImportResult {
 
-    public enum Status {
-        CREATED,
-        UPDATED,
-        EXISTS,
-        ERROR;
-    }
-
+    private String fileName;
     private Long recordNumber;
-    private Status athleteImportStatus;
-    private Status rosterImportStatus;
+    private ImportResultStatus athleteImportStatus = ImportResultStatus.UNPROCESSED;
+    private ImportResultStatus rosterImportStatus = ImportResultStatus.UNPROCESSED;
     private AthleteRoster roster;
     private String message;
+
+    public boolean hasErrorStatus() {
+        return (athleteImportStatus == ImportResultStatus.ERROR ||
+                rosterImportStatus == ImportResultStatus.ERROR);
+    }
 }

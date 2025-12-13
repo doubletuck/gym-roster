@@ -43,8 +43,8 @@ public class College extends BaseEntity {
     private String shortName;
 
     @NotBlank(message = "Long name is required")
-    @Size(max = 50, message = "Long name must have 50 or fewer characters")
-    @Column(name = "long_name", nullable = false, length = 50)
+    @Size(max = 100, message = "Long name must have 100 or fewer characters")
+    @Column(name = "long_name", nullable = false, length = 100)
     private String longName;
 
     @NotBlank(message = "City is required")

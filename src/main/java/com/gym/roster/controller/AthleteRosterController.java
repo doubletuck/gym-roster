@@ -1,6 +1,6 @@
 package com.gym.roster.controller;
 
-import com.gym.roster.parser.AthleteRosterCsvImporter;
+import com.gym.roster.parser.AthleteRosterImporter;
 import com.gym.roster.parser.AthleteRosterImportResult;
 import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
@@ -24,16 +24,28 @@ public class AthleteRosterController {
     private final CollegeService collegeService;
 
     @Autowired
-    public AthleteRosterController(AthleteRosterService athleteRosterService, CollegeService collegeService, AthleteService athleteService) {
+    public AthleteRosterController(AthleteRosterService athleteRosterService, CollegeService collegeService,
+            AthleteService athleteService) {
         this.athleteRosterService = athleteRosterService;
         this.collegeService = collegeService;
         this.athleteService = athleteService;
     }
 
     @PostMapping("/file-import")
-    public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) throws Exception {
-        AthleteRosterCsvImporter importer = new AthleteRosterCsvImporter(collegeService, athleteService, athleteRosterService);
-        importer.parseFile(file);
-        return ResponseEntity.ok(importer.getImportResults());
+    public ResponseEntity<List<AthleteRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file)
+            throws Exception {
+        AthleteRosterImporter importer = new AthleteRosterImporter(collegeService, athleteService,
+                athleteRosterService);
+        List<AthleteRosterImportResult> results = importer.parseFile(file);
+        return ResponseEntity.ok(results);
+    }
+
+    @PostMapping("/directory-import")
+    public ResponseEntity<Boolean> importRosterFromDirectory(@RequestParam String directoryPath)
+            throws Exception {
+        AthleteRosterImporter importer = new AthleteRosterImporter(collegeService, athleteService,
+                athleteRosterService);
+        importer.parseDirectory(directoryPath);
+        return ResponseEntity.ok(true);
     }
 }

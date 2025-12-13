@@ -2,7 +2,8 @@ package com.gym.roster.service;
 
 import com.gym.roster.domain.College;
 import com.gym.roster.exception.ValidationException;
-import com.gym.roster.parser.CollegeCsvImporter;
+import com.gym.roster.parser.CollegeImporter;
+import com.gym.roster.parser.ImportResultStatus;
 import com.gym.roster.parser.CollegeImportResult;
 import com.gym.roster.repository.CollegeRepository;
 import jakarta.validation.ConstraintViolation;
@@ -83,7 +84,7 @@ public class CollegeService {
     public List<CollegeImportResult> importCollegesFromFile(MultipartFile multipartFile) throws Exception {
 
         logger.info("Initiating the import of college data from an uploaded file.");
-        List<College> fileColleges = CollegeCsvImporter.parseFile(multipartFile);
+        List<College> fileColleges = CollegeImporter.parseFile(multipartFile);
         logger.info("College data was parsed from the uploaded file. Total colleges parsed: {}.", fileColleges.size());
 
         ArrayList<CollegeImportResult> collegeImportResults = new ArrayList<>();
@@ -104,18 +105,18 @@ public class CollegeService {
         if (dbCollege == null) {
             try {
                 dbCollege = save(fileCollege);
-                importResult.setImportStatus(CollegeImportResult.Status.CREATED);
+                importResult.setImportStatus(ImportResultStatus.CREATED);
             } catch (ValidationException e) {
-                importResult.setImportStatus(CollegeImportResult.Status.ERROR);
+                importResult.setImportStatus(ImportResultStatus.ERROR);
                 importResult.setMessage("Saving failed because of the following validation errors: "+ e.getErrorListText());
                 logger.error("Validation errors occurred when trying to save this college imported from the file: {}. The validation errors are: {}", fileCollege, e.getErrorListText());
             } catch (Exception e) {
-                importResult.setImportStatus(CollegeImportResult.Status.ERROR);
+                importResult.setImportStatus(ImportResultStatus.ERROR);
                 importResult.setMessage(e.getMessage());
                 logger.error(e.getMessage(), e);
             }
         } else {
-            importResult.setImportStatus(CollegeImportResult.Status.EXISTS);
+            importResult.setImportStatus(ImportResultStatus.EXISTS);
         }
         importResult.setCollege(dbCollege);
         logger.info("Import data result: {}", importResult);

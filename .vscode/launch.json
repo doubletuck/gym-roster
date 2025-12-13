@@ -1,0 +1,16 @@
+{
+  // Use this file to easily run and debug Java code in VS Code
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "Debug Spring Boot (Application)",
+      "request": "launch",
+      "mainClass": "com.gym.roster.Application",
+      "projectName": "gym-roster",
+      "args": "--spring.profiles.active=local",
+      "cwd": "${workspaceFolder}",
+      "console": "integratedTerminal"
+     }
+  ]
+}

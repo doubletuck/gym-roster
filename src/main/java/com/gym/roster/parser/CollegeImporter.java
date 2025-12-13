@@ -18,9 +18,9 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CollegeCsvImporter {
+public class CollegeImporter {
 
-    private final static Logger logger = LoggerFactory.getLogger(CollegeCsvImporter.class);
+    private final static Logger logger = LoggerFactory.getLogger(CollegeImporter.class);
 
     public enum Headers {
         CODE_NAME, SHORT_NAME, LONG_NAME, CITY, STATE,
@@ -36,7 +36,7 @@ public class CollegeCsvImporter {
         multipartFile.transferTo(tempFile);
         logger.debug("Saved uploaded college data file to a temporary file: {}.", tempFile.getAbsoluteFile());
 
-        List<College> parsedFile = CollegeCsvImporter.parseFile(tempFile);
+        List<College> parsedFile = CollegeImporter.parseFile(tempFile);
         tempFile.deleteOnExit();
         return parsedFile;
     }
