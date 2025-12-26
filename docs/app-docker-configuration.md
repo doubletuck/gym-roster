@@ -1,8 +1,7 @@
 
 # Setting up and running the application in Docker
 
-The application and the database containers cannot run at the same time unless they are started in a docker compose. 
-Containers have isolated networks where they need to be explicitly linked or put on the same network.
+Because containers have isolated networks where they need to be explicitly linked or put on the same network, the application and the database containers cannot run at the same time unless they are started in a docker compose. See the [Running in Docker locally](./development-run.md#running-in-docker-locally) section for `docker compose` instructions.
 
 
 ## Build the application Docker image
