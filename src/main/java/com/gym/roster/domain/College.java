@@ -85,7 +85,8 @@ public class College extends BaseEntity {
         }
         this.state = State.find(state);
         if (this.state == null) {
-            logger.warn("Home state is invalid: {}. Setting the state to null for athlete: {}", state, this.getId());
+            logger.warn("State is invalid: {}. Setting the state to null for college: {}, id: {}", state,
+                    this.getCodeName(), this.getId());
         }
     }
 }
