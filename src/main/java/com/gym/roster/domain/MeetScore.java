@@ -17,6 +17,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.util.List;
 
@@ -27,11 +29,14 @@ import java.util.List;
 @ToString
 @Entity
 @Table(name = "meet_score", uniqueConstraints = {
-        @UniqueConstraint(
-                name = "uk_meet_score",
-                columnNames = { "athlete_roster_id", "event_code" })
+        @UniqueConstraint(name = "uk_meet_score", columnNames = { "meet_id", "athlete_roster_id", "event_code" })
 })
 public class MeetScore extends BaseEntity {
+
+    @NotNull(message = "Meet is required")
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "meet_id", nullable = false, foreignKey = @ForeignKey(name = "fk_meet_score_meet"))
+    private Meet meet;
 
     @NotNull(message = "Athlete is required")
     @ManyToOne(fetch = FetchType.EAGER)
@@ -43,15 +48,15 @@ public class MeetScore extends BaseEntity {
     @Column(name = "event_code", nullable = false, length = 20)
     private Event event;
 
-    @Column(name = "round")
-    private Integer round;
+    @Column(name = "rotation")
+    private Integer rotation;
 
-    @Column(name = "order")
-    private Integer order;
+    @Column(name = "start_order")
+    private Integer startOrder;
 
     @NotNull(message = "Score is required")
-    @Column(name = "score", nullable = false)
-    private Double score;
+    @Column(name = "final_score", nullable = false)
+    private Double finalScore;
 
     @Column(name = "difficulty_score")
     private Double difficultyScore;
@@ -71,11 +76,7 @@ public class MeetScore extends BaseEntity {
     @Column(name = "is_score_edited", nullable = false)
     private Boolean isScoreEdited = false;
 
+    @Column(name = "score_details", columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
     private List<MeetScoreDetail> scoreDetails;
-}
-
-class MeetScoreDetail {
-    private String judge;
-    private Double startValue;
-    private Double score;
 }
