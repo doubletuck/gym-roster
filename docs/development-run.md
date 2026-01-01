@@ -41,6 +41,12 @@ mvn flyway:clean -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://l
 ```
 
 ### Optional: Run migration
+
+Recompile to ensure the latest SQL definitions are in the target/classes directory.
+```shell
+mvn clean compile
+```
+
 After clearing the database, run the migration script(s).
 ```shell
 mvn flyway:migrate -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster -Dflyway.user=postgres -Dflyway.password=gympass
