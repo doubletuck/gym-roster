@@ -2,15 +2,16 @@ name: Validate
 
 on:
   pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  packages: read
+  pull_request: read
 
 jobs:
   build:
     runs-on: ubuntu-latest
-
-    permissions:
-      contents: read
-      packages: read
-      pull_request: read
 
     steps:
       - name: Checkout code
