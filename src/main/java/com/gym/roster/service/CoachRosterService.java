@@ -9,10 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class CoachRosterService {
@@ -24,7 +22,7 @@ public class CoachRosterService {
         this.coachRosterRepository = coachRosterRepository;
     }
 
-    public Optional<CoachRoster> findById(UUID id) {
+    public Optional<CoachRoster> findById(Long id) {
         return coachRosterRepository.findById(id);
     }
 
@@ -37,15 +35,10 @@ public class CoachRosterService {
     }
 
     public CoachRoster save(CoachRoster roster) {
-        Instant now = Instant.now();
-        if (roster.getId() == null) {
-            roster.setCreationTimestamp(now);
-        }
-        roster.setLastUpdateTimestamp(now);
         return coachRosterRepository.save(roster);
     }
 
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         coachRosterRepository.deleteById(id);
     }
 

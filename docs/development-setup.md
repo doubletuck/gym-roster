@@ -11,6 +11,7 @@ This document provides information for a developer to get their local developmen
 * [Install PostgreSQL](#install-postgresql)
 * [Install psql](#install-psql)
 * [Create database](#create-database)
+* [Setup GitHub personal access token](#setup-github-personal-access-token)
 
 ## Required Software
 * Homebrew - A package manager for installing software libraries and packages.
@@ -144,3 +145,42 @@ Run the `create database <database-name>` command.
 ```text
 create database gymroster;
 ```
+
+## Setup GitHub personal access token
+
+This project uses the [gym-common](https://github.com/doubletuck/gym-common) library which is hosted as a GitHub package. This project's [pom.xml](../pom.xml) has a repository setting that refers to the this package repository. Because GitHub packages require authentication to access the artifacts, you will need to have a token that allows your account to access packages. This will be needed for fetching libraries locally as well as running workflow actions used by this project.
+
+#### Generate GitHub token
+
+1. Go to `Settings` in your GitHub developer account
+1. Click the `Developer settings` menu option
+1. Click the `Personal access tokens` menu option and select the `Tokens (classic)` option
+1. Click on the `Generate new token (classic)` button to view the create page
+1. The values below are guidelines, but do not have to what is provided **except** for the `Select scopes`:
+   - **Note**: `Package registry reader token`
+   - **Expiration**: No expiration
+   - **Select scopes**: Select `read:packages`
+1. Press the `Generate token` button
+1. *Copy the personal access token* **immediately** as it will not be accessible again
+
+
+#### Update local maven settings.xml file
+
+If you don't already have a `~/.m2/settings.xml` file then create one and copy the block below into the file.
+
+```xml
+<settings>
+    <servers>
+        <server>
+            <id>github</id>
+            <username>your-github-username</username>
+            <password>your-github-access-token</password>
+        </server>
+    </servers>
+</settings>
+```
+
+Replace `your-github-username` with the username of your GitHub developer account where you generated the personal access token.
+
+Replace `your-github-access-token` with the generated token value that you copied in the steps above.
+

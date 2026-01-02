@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/roster/coach")
@@ -48,7 +47,7 @@ public class CoachRosterController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<CoachRoster> findById(@PathVariable UUID id) {
+    public ResponseEntity<CoachRoster> findById(@PathVariable Long id) {
         return coachRosterService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
@@ -62,7 +61,7 @@ public class CoachRosterController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         coachRosterService.deleteById(id);
         return ResponseEntity.noContent().build();
     }

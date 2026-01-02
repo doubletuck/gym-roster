@@ -22,7 +22,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/college")
@@ -36,7 +35,7 @@ public class CollegeController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<College> findById(@PathVariable UUID id) {
+    public ResponseEntity<College> findById(@PathVariable Long id) {
         return collegeService.findById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
@@ -49,7 +48,7 @@ public class CollegeController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<College> update(@PathVariable UUID id, @RequestBody College college) {
+    public ResponseEntity<College> update(@PathVariable Long id, @RequestBody College college) {
         Optional<College> existingCollege = collegeService.findById(id);
         if (existingCollege.isPresent()) {
             College updatedCollege = existingCollege.get();
@@ -66,7 +65,7 @@ public class CollegeController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteById(@PathVariable UUID id) {
+    public ResponseEntity<Void> deleteById(@PathVariable Long id) {
         collegeService.deleteById(id);
         return ResponseEntity.noContent().build();
     }
