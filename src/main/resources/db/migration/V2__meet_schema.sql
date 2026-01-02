@@ -5,7 +5,7 @@ CREATE TABLE meet (
     location VARCHAR(100),
     creation_timestamp TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     last_update_timestamp TIMESTAMP(6) WITH TIME ZONE NOT NULL,
-    CONSTRAINT uk_meet UNIQUE (event_date, event_name),
+    CONSTRAINT uk_meet UNIQUE (event_date, event_name)
 );
 
 CREATE TABLE meet_score (
@@ -22,7 +22,7 @@ CREATE TABLE meet_score (
     bonus_points DOUBLE PRECISION,
     has_score_inquiry BOOLEAN NOT NULL DEFAULT FALSE,
     is_score_edited BOOLEAN NOT NULL DEFAULT FALSE,
-    score_details JSONB,
+    score_details JSON,
     creation_timestamp TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     last_update_timestamp TIMESTAMP(6) WITH TIME ZONE NOT NULL,
     CONSTRAINT uk_meet_score UNIQUE (meet_id, athlete_roster_id, event_code),

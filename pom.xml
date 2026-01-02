@@ -62,7 +62,6 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
         <dependency>
@@ -95,10 +94,40 @@
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
             </plugin>
+            
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
             </plugin>
+            
+            <!-- Flyway validation -->
+            <plugin>
+                <groupId>org.flywaydb</groupId>
+                <artifactId>flyway-maven-plugin</artifactId>
+                <dependencies>
+                    <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>${h2.version}</version>
+                    </dependency>
+                </dependencies>
+                <executions>
+                    <execution>
+                        <id>flyway-validate</id>
+                        <phase>verify</phase>
+                        <goals>
+                            <goal>migrate</goal>
+                            <goal>validate</goal>
+                        </goals>
+                        <configuration>
+                            <url>jdbc:h2:mem:validate;DB_CLOSE_DELAY=-1</url>
+                            <user>sa</user>
+                            <password></password>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
         </plugins>
     </build>
 

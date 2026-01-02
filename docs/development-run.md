@@ -57,6 +57,15 @@ mvn flyway:migrate -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql:/
 mvn install 
 ```
 
+## Testing
+```shell
+mvn verify
+```
+This will:
+- run unit tests
+- run integration tests
+- validate the flyway migration scripts DDL matches the entity definitions
+
 ## Running
 The `local` application properties profile, [application-local.yml](../src/main/resources/application-local.yml), defaults to local development environment values. If you followed the development setup guide, then the configuration will work as is. If you modified your setup (i.e., changed the database name or password), then you will need to adjust the properties values appropriately.
 
