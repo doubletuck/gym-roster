@@ -18,12 +18,10 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
-import java.util.UUID;
 
 @Service
 public class CollegeService {
@@ -38,7 +36,7 @@ public class CollegeService {
         this.validator = validator;
     }
 
-    public Optional<College> findById(UUID id) {
+    public Optional<College> findById(Long id) {
         return collegeRepository.findById(id);
     }
 
@@ -64,16 +62,10 @@ public class CollegeService {
         if (!errors.isEmpty()) {
             throw new ValidationException(errors);
         }
-
-        Instant now = Instant.now();
-        if (college.getId() == null) {
-            college.setCreationTimestamp(now);
-        }
-        college.setLastUpdateTimestamp(now);
         return collegeRepository.save(college);
     }
 
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         collegeRepository.deleteById(id);
     }
 

@@ -9,10 +9,8 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class AthleteRosterService {
@@ -28,7 +26,7 @@ public class AthleteRosterService {
         return athleteRosterRepository.findAll();
     }
 
-    public Optional<AthleteRoster> findById(UUID id) {
+    public Optional<AthleteRoster> findById(Long id) {
         return athleteRosterRepository.findById(id);
     }
 
@@ -37,20 +35,14 @@ public class AthleteRosterService {
     }
 
     public AthleteRoster save(AthleteRoster member) {
-        Instant now = Instant.now();
-        if (member.getId() == null) {
-            member.setCreationTimestamp(now);
-        }
-        member.setLastUpdateTimestamp(now);
         return athleteRosterRepository.save(member);
     }
 
-    public void deleteById(UUID id) {
+    public void deleteById(Long id) {
         athleteRosterRepository.deleteById(id);
     }
 
     public Page<AthleteRoster> getPaginatedEntities(Pageable pageable) {
         return athleteRosterRepository.findAll(pageable);
     }
-
 }

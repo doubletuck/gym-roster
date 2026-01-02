@@ -76,7 +76,7 @@ public class MeetScore extends BaseEntity {
     @Column(name = "is_score_edited", nullable = false)
     private Boolean isScoreEdited = false;
 
-    @Column(name = "score_details", columnDefinition = "jsonb")
+    @Column(name = "score_details", columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<MeetScoreDetail> scoreDetails;
 }

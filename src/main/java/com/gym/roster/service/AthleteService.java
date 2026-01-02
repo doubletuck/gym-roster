@@ -7,7 +7,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.Optional;
 
 @Service
@@ -29,11 +28,6 @@ public class AthleteService {
     }
 
     public Athlete save(Athlete athlete) {
-        Instant now = Instant.now();
-        if (athlete.getId() == null) {
-            athlete.setCreationTimestamp(now);
-        }
-        athlete.setLastUpdateTimestamp(now);
         return athleteRepository.save(athlete);
     }
 
