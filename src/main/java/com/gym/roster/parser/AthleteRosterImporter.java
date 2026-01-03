@@ -20,7 +20,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AthleteRosterImporter extends AbstractRosterImporter<AthleteRosterImportResult> {
+public class AthleteRosterImporter extends AbstractImporter<AthleteRosterImportResult> {
 
     private final static Logger logger = LoggerFactory.getLogger(AthleteRosterImporter.class);
 

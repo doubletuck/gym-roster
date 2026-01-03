@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -22,7 +23,7 @@ import java.util.Date;
 @Table(name =  "meet")   
 public class Meet extends BaseEntity {
 
-    @NotBlank(message = "Event date is required")
+    @NotNull(message = "Event date is required")
     @Column(name = "event_date", nullable = false)
     private Date eventDate;
 
