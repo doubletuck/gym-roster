@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Getter
 @Setter
@@ -25,7 +25,7 @@ public class Meet extends BaseEntity {
 
     @NotNull(message = "Event date is required")
     @Column(name = "event_date", nullable = false)
-    private Date eventDate;
+    private LocalDate eventDate;
 
     @NotBlank(message = "Event name is required")
     @Size(max = 200, message = "Name must have 200 or fewer characters")

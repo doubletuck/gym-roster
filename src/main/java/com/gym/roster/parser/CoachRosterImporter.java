@@ -117,8 +117,6 @@ public class CoachRosterImporter extends AbstractImporter<CoachRosterImportResul
                 currentImportResult.setCoachImportStatus(ImportResultStatus.CREATED);
                 logger.info("CoachRoster Import {} - Record {} - Coach created: {}.", file.getName(),
                         record.getRecordNumber(), coach);
-                logger.info("CoachRoster Import {} - Record {} - Created new Coach: {}.", file.getName(),
-                        record.getRecordNumber(), coach);
             } catch (Exception e) {
                 currentImportResult.setCoachImportStatus(ImportResultStatus.ERROR);
                 currentImportResult.setMessage("Error creating new Coach: " + e.getMessage());
