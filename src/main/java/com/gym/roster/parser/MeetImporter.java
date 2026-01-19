@@ -33,7 +33,7 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
     private CSVRecord currentRecord;
     private MeetImportResult currentImportResult;
     private List<MeetImportResult> importResults = new ArrayList<>();
-    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("MM/dd/yyyy");
+    private DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("M/d/yyyy");
     private Meet meet;
 
     public MeetImporter(CollegeService collegeService,
