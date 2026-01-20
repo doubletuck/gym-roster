@@ -19,7 +19,7 @@ import java.io.Reader;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImportResult> {
+public class CoachRosterImporter extends AbstractImporter<CoachRosterImportResult> {
 
     private final static Logger logger = LoggerFactory.getLogger(CoachRosterImporter.class);
 
@@ -116,8 +116,6 @@ public class CoachRosterImporter extends AbstractRosterImporter<CoachRosterImpor
                 coach = coachService.save(coach);
                 currentImportResult.setCoachImportStatus(ImportResultStatus.CREATED);
                 logger.info("CoachRoster Import {} - Record {} - Coach created: {}.", file.getName(),
-                        record.getRecordNumber(), coach);
-                logger.info("CoachRoster Import {} - Record {} - Created new Coach: {}.", file.getName(),
                         record.getRecordNumber(), coach);
             } catch (Exception e) {
                 currentImportResult.setCoachImportStatus(ImportResultStatus.ERROR);

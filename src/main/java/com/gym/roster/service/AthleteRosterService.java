@@ -34,6 +34,15 @@ public class AthleteRosterService {
         return athleteRosterRepository.findByYearCollegeAndAthlete(seasonYear, college, athlete);
     }
 
+    public AthleteRoster findByYearCollegeNameAndAthleteName(
+            Short seasonYear,
+            String collegeName,
+            String athleteFirstName,
+            String athleteLastName) {
+        return athleteRosterRepository.findByYearCollegeNameAndAthleteName(seasonYear, collegeName, athleteFirstName,
+                athleteLastName);
+    }
+
     public AthleteRoster save(AthleteRoster member) {
         return athleteRosterRepository.save(member);
     }

@@ -18,9 +18,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
-public abstract class AbstractRosterImporter<T extends ImportResult> {
+public abstract class AbstractImporter<T extends ImportResult> {
 
-    private final static Logger logger = LoggerFactory.getLogger(AbstractRosterImporter.class);
+    private final static Logger logger = LoggerFactory.getLogger(AbstractImporter.class);
     final Map<String, College> collegeMap = new HashMap<>();
     
     long importFilesTotalCount = 0;
