@@ -20,6 +20,7 @@ import lombok.ToString;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Getter
@@ -79,4 +80,14 @@ public class MeetScore extends BaseEntity {
     @Column(name = "score_details", columnDefinition = "json")
     @JdbcTypeCode(SqlTypes.JSON)
     private List<MeetScoreDetail> scoreDetails;
+
+    public void addScoreDetail(MeetScoreDetail meetScoreDetail) {
+        if (meetScoreDetail == null)
+            return;
+
+        if (scoreDetails == null) {
+            scoreDetails = new ArrayList<>();
+        }
+        scoreDetails.add(meetScoreDetail);
+    }
 }

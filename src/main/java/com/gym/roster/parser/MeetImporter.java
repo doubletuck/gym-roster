@@ -4,6 +4,7 @@ import com.doubletuck.gym.common.model.Event;
 import com.gym.roster.domain.AthleteRoster;
 import com.gym.roster.domain.Meet;
 import com.gym.roster.domain.MeetScore;
+import com.gym.roster.domain.MeetScoreDetail;
 import com.gym.roster.service.AthleteRosterService;
 import com.gym.roster.service.CollegeService;
 import com.gym.roster.service.MeetService;
@@ -20,6 +21,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MeetImporter extends AbstractImporter<MeetImportResult> {
 
@@ -37,8 +40,8 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
     private Meet meet;
 
     public MeetImporter(CollegeService collegeService,
-                        AthleteRosterService athleteRosterService,
-                        MeetService meetService) {
+            AthleteRosterService athleteRosterService,
+            MeetService meetService) {
         this.collegeService = collegeService;
         this.athleteRosterService = athleteRosterService;
         this.meetService = meetService;
@@ -74,7 +77,7 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
         try {
             Reader fileReader = new FileReader(file);
             Iterable<CSVRecord> records = CSVFormat.RFC4180.builder()
-                    .setHeader(MeetImporter.Headers.class)
+                    .setHeader()
                     .setSkipHeaderRecord(true)
                     .setIgnoreEmptyLines(true)
                     .setTrim(true)
@@ -87,16 +90,19 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
                 currentImportResult.setFileName(file.getName());
                 currentImportResult.setRecordNumber(record.getRecordNumber());
 
-                // If the meet is null, then this is the first record. Retrieve from the database
-                // and create it if not found. If the meet is not found or cannot be created, then
+                // If the meet is null, then this is the first record. Retrieve from the
+                // database
+                // and create it if not found. If the meet is not found or cannot be created,
+                // then
                 // terminate processing since all scores require a meet instance.
                 fetchOrCreateMeet();
                 if (meet == null) {
-                    logger.error("Meet Import {} - Record {} - Terminate processing since a meet instance cannot be found or created for event name '{}' on date {}",
+                    logger.error(
+                            "Meet Import {} - Record {} - Terminate processing since a meet instance cannot be found or created for event name '{}' on date {}",
                             file.getName(),
                             record.getRecordNumber(),
-                            record.get(Headers.MEET_NAME),
-                            record.get(Headers.DATE));
+                            record.get(Headers.MEET_NAME.ordinal()),
+                            record.get(Headers.DATE.ordinal()));
                     importResults.add(currentImportResult);
                     break;
                 }
@@ -116,13 +122,15 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
     }
 
     private void fetchOrCreateMeet() {
-        // If the meet value already exists, then exit. Earlier processing already established
+        // If the meet value already exists, then exit. Earlier processing already
+        // established
         // this value for other file records to use.
-        if (this.meet != null) return;
+        if (this.meet != null)
+            return;
 
         // If the meet does not exist, then look it up in the database.
-        LocalDate eventDate = LocalDate.parse(currentRecord.get(Headers.DATE), dateFormatter);
-        String eventName = currentRecord.get(Headers.MEET_NAME);
+        LocalDate eventDate = LocalDate.parse(currentRecord.get(Headers.DATE.ordinal()), dateFormatter);
+        String eventName = currentRecord.get(Headers.MEET_NAME.ordinal());
         this.meet = meetService.findByDateAndName(eventDate, eventName);
 
         // If the meet does not exist in the database, then create it.
@@ -132,32 +140,38 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
             newMeet.setEventName(eventName);
             try {
                 this.meet = meetService.saveMeet(newMeet);
-                logger.info("Meet Import {} - Record {} - Meet created: {}", file.getName(), currentRecord.getRecordNumber(), meet);
+                logger.info("Meet Import {} - Record {} - Meet created: {}", file.getName(),
+                        currentRecord.getRecordNumber(), meet);
             } catch (Exception e) {
                 currentImportResult.setImportStatus(ImportResultStatus.ERROR);
-                logger.error("Meet Import {} - Record {} - Error creating new Meet: {}. Error: {}", file.getName(), currentRecord.getRecordNumber(), eventName, e.getMessage());
+                logger.error("Meet Import {} - Record {} - Error creating new Meet: {}. Error: {}", file.getName(),
+                        currentRecord.getRecordNumber(), eventName, e.getMessage());
                 this.meet = null;
             }
         } else {
-            logger.info("Meet Import {} - Record {} - Meet exists: {}", file.getName(), currentRecord.getRecordNumber(), meet);
+            logger.info("Meet Import {} - Record {} - Meet exists: {}", file.getName(), currentRecord.getRecordNumber(),
+                    meet);
         }
     }
 
     private AthleteRoster fetchAthleteRoster(LocalDate eventDate) {
 
         int seasonYear = eventDate.getYear();
-        String collegeCodeName = currentRecord.get(Headers.TEAM);
-        String athleteName = currentRecord.get(Headers.ATHLETE_NAME);
+        String collegeCodeName = currentRecord.get(Headers.TEAM.ordinal());
+        String athleteName = currentRecord.get(Headers.ATHLETE_NAME.ordinal());
         String[] athleteNameArray = parseName(athleteName);
 
         try {
-            return athleteRosterService.findByYearCollegeNameAndAthleteName((short)seasonYear, collegeCodeName, athleteNameArray[0], athleteNameArray[1]);
+            return athleteRosterService.findByYearCollegeNameAndAthleteName((short) seasonYear, collegeCodeName,
+                    athleteNameArray[0], athleteNameArray[1]);
         } catch (Exception e) {
-            logger.error("Meet Import {} - Record {} - No athlete roster found for year = {}, college = '{}', and athlete name '{}': {}",
+            logger.error(
+                    "Meet Import {} - Record {} - No athlete roster found for year = {}, college = '{}', and athlete name '{}': {}",
                     file.getName(), currentRecord.getRecordNumber(), meet.getEventDate().getYear(), collegeCodeName,
                     athleteName, e.getMessage());
             currentImportResult.setImportStatus(ImportResultStatus.ERROR);
-            currentImportResult.setMessage("No athlete roster found for year = " + meet.getEventDate().getYear() + ", college = '" + collegeCodeName + "', and athlete name '" + athleteName + "'");
+            currentImportResult.setMessage("No athlete roster found for year = " + meet.getEventDate().getYear()
+                    + ", college = '" + collegeCodeName + "', and athlete name '" + athleteName + "'");
         }
 
         return null;
@@ -165,7 +179,7 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
 
     private MeetScore fetchOrCreateMeetScore(Meet meet, AthleteRoster athleteRoster) {
 
-        Event event = Event.find(currentRecord.get(Headers.EVENT));
+        Event event = Event.find(currentRecord.get(Headers.EVENT.ordinal()));
 
         MeetScore meetScore = meetService.findScoreByMeetAthleteRosterAndEvent(meet, athleteRoster, event);
         if (meetScore == null) {
@@ -174,56 +188,105 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
                 meetScore.setMeet(meet);
                 meetScore.setAthleteRoster(athleteRoster);
                 meetScore.setEvent(event);
-                meetScore.setRotation(parseInteger(currentRecord.get(Headers.ROUND)));
-                meetScore.setStartOrder(parseInteger(currentRecord.get(Headers.ORDER)));
-                meetScore.setFinalScore(parseDouble(currentRecord.get(Headers.SCORE)));
-                meetScore.setDifficultyScore(parseDouble(currentRecord.get(Headers.DIFFICULTY)));
-                meetScore.setExecutionScore(parseDouble(currentRecord.get(Headers.EXECUTION)));
-                meetScore.setNeutralDeduction(parseDouble(currentRecord.get(Headers.NEUTRAL_DEDUCTION)));
-                meetScore.setBonusPoints(parseDouble(currentRecord.get(Headers.STICK_BONUS)));
-                meetScore.setHasScoreInquiry(parseBoolean(currentRecord.get(Headers.INQUIRY)));
-                meetScore.setIsScoreEdited(parseBoolean(currentRecord.get(Headers.EDITED)));
+                meetScore.setRotation(parseInteger(currentRecord.get(Headers.ROUND.ordinal())));
+                meetScore.setStartOrder(parseInteger(currentRecord.get(Headers.ORDER.ordinal())));
+                meetScore.setFinalScore(parseDouble(currentRecord.get(Headers.SCORE.ordinal())));
+                meetScore.setDifficultyScore(parseDouble(currentRecord.get(Headers.DIFFICULTY.ordinal())));
+                meetScore.setExecutionScore(parseDouble(currentRecord.get(Headers.EXECUTION.ordinal())));
+                meetScore.setNeutralDeduction(parseDouble(currentRecord.get(Headers.NEUTRAL_DEDUCTION.ordinal())));
+                meetScore.setBonusPoints(parseDouble(currentRecord.get(Headers.STICK_BONUS.ordinal())));
+                meetScore.setHasScoreInquiry(parseBoolean(currentRecord.get(Headers.INQUIRY.ordinal())));
+                meetScore.setIsScoreEdited(parseBoolean(currentRecord.get(Headers.EDITED.ordinal())));
+                meetScore.setScoreDetails(parseScoreDetails());
                 meetScore = meetService.saveMeetScore(meetScore);
                 currentImportResult.setImportStatus(ImportResultStatus.CREATED);
-                logger.info("Meet Import {} - Record {} - MeetScore created: {}", file.getName(), currentRecord.getRecordNumber(), meetScore);
+                logger.info("Meet Import {} - Record {} - MeetScore created: {}", file.getName(),
+                        currentRecord.getRecordNumber(), meetScore);
             } catch (Exception e) {
                 currentImportResult.setImportStatus(ImportResultStatus.ERROR);
                 currentImportResult.setMessage("Error creating new MeetScore: " + e.getMessage());
-                logger.error("Meet Import {} - Error creating new MeetScore: {}. Error: {}", file.getName(), currentRecord.getRecordNumber(), e.getMessage());
+                logger.error("Meet Import {} - Error creating new MeetScore: {}. Error: {}", file.getName(),
+                        currentRecord.getRecordNumber(), e.getMessage());
             }
         } else {
             currentImportResult.setImportStatus(ImportResultStatus.EXISTS);
-            logger.info("Meet Import {} - Record {} - MeetScore exists: {}", file.getName(), currentRecord.getRecordNumber(), meetScore);
+            logger.info("Meet Import {} - Record {} - MeetScore exists: {}", file.getName(),
+                    currentRecord.getRecordNumber(), meetScore);
         }
 
         currentImportResult.setMeetScore(meetScore);
         return meetScore;
     }
 
+    private List<MeetScoreDetail> parseScoreDetails() {
+        List<MeetScoreDetail> scoreDetails = new ArrayList<>();
+
+        // Map to store SV and J values by judge number
+        java.util.Map<Integer, MeetScoreDetail> judgeMap = new java.util.HashMap<>();
+
+        // Pattern to match SVn or Jn format
+        Pattern pattern = Pattern.compile("^(SV|J)(\\d+)$");
+
+        // Iterate through all record values with their header names
+        for (int i = 0; i < currentRecord.size(); i++) {
+            String header = currentRecord.getParser().getHeaderNames().get(i);
+            Matcher matcher = pattern.matcher(header);
+            if (matcher.matches()) {
+                String type = matcher.group(1); // "SV" or "J"
+                int judgeNumber = Integer.parseInt(matcher.group(2));
+
+                String value = currentRecord.get(i);
+                if (value != null && !value.isBlank()) {
+                    // Get or create the MeetScoreDetail for this judge number
+                    MeetScoreDetail detail = judgeMap.computeIfAbsent(judgeNumber, k -> new MeetScoreDetail());
+                    detail.setJudge(String.valueOf(judgeNumber));
+
+                    if (type.equals("SV")) {
+                        detail.setStartValue(parseDouble(value));
+                    } else if (type.equals("J")) {
+                        detail.setScore(parseDouble(value));
+                    }
+                }
+            }
+        }
+
+        // Add all judge details to the list in order of judge number
+        judgeMap.keySet().stream()
+                .sorted()
+                .forEach(judgeNumber -> scoreDetails.add(judgeMap.get(judgeNumber)));
+
+        return scoreDetails.isEmpty() ? null : scoreDetails;
+    }
+
     private Integer parseInteger(String value) {
-        if (value == null || value.isBlank()) return null;
+        if (value == null || value.isBlank())
+            return null;
         return Integer.parseInt(value);
     }
 
     private Double parseDouble(String value) {
-        if (value == null || value.isBlank()) return null;
+        if (value == null || value.isBlank())
+            return null;
         return Double.parseDouble(value);
     }
 
     private boolean parseBoolean(String value) {
-        if (value == null || value.isBlank()) return false;
+        if (value == null || value.isBlank())
+            return false;
 
         String cleanValue = value.trim().toLowerCase();
         if (cleanValue.equals("y") ||
                 cleanValue.equals("true") ||
-                cleanValue.equals("t")) return true;
+                cleanValue.equals("t"))
+            return true;
         return false;
     }
 
     private String[] parseName(String nameText) {
         String[] firstAndLastNameArray = new String[2];
 
-        if (nameText == null || nameText.isBlank()) return firstAndLastNameArray;
+        if (nameText == null || nameText.isBlank())
+            return firstAndLastNameArray;
 
         nameText = nameText.trim();
         String[] tempArray = nameText.split("\\s+");
@@ -233,8 +296,9 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
             firstAndLastNameArray = tempArray;
         } else {
             StringBuilder builder = new StringBuilder();
-            for(int i=0; i<tempArray.length-1; i++) {
-                if (i > 0) builder.append(" ");
+            for (int i = 0; i < tempArray.length - 1; i++) {
+                if (i > 0)
+                    builder.append(" ");
                 builder.append(tempArray[i]);
             }
             firstAndLastNameArray[0] = builder.toString();

@@ -93,6 +93,8 @@ public class MeetScoreRepositoryTest {
         testMeetScore.setBonusPoints(0.0);
         testMeetScore.setHasScoreInquiry(false);
         testMeetScore.setIsScoreEdited(false);
+        testMeetScore.addScoreDetail(new MeetScoreDetail("1", 10.0, 9.85));
+        testMeetScore.addScoreDetail(new MeetScoreDetail("2", 10.0, 9.8));
         testMeetScore = meetScoreRepository.save(testMeetScore);
     }
 
@@ -113,6 +115,7 @@ public class MeetScoreRepositoryTest {
         assertEquals(9.5, found.getExecutionScore());
         assertEquals(1, found.getRotation());
         assertEquals(3, found.getStartOrder());
+        assertEquals(2, found.getScoreDetails().size());
     }
 
     @Test
