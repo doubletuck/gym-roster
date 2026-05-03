@@ -1,7 +1,9 @@
 package com.gym.roster.service;
 
 import com.gym.roster.domain.Athlete;
+import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.repository.AthleteRepository;
+import com.gym.roster.specification.AthleteSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -35,7 +37,10 @@ public class AthleteService {
         athleteRepository.deleteById(id);
     }
 
-    public Page<Athlete> getPaginatedEntities(Pageable pageable) {
-        return athleteRepository.findAll(pageable);
+    public Page<Athlete> getPaginatedEntities(AthleteFilterParams params, Pageable pageable) {
+        if (params.academicYear() != null && !params.academicYear().isBlank() && params.seasonYear() == null) {
+            throw new IllegalArgumentException("academicYear requires seasonYear");
+        }
+        return athleteRepository.findAll(AthleteSpecification.build(params), pageable);
     }
 }

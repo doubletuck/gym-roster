@@ -29,7 +29,7 @@ Returns a single athlete by ID.
 
 ### GET /athlete
 
-Returns a paginated list of athletes.
+Returns a paginated, filtered list of athletes. All filter parameters are optional and may be combined freely. Omitting all filter parameters returns all athletes.
 
 **Query Parameters**
 
@@ -37,12 +37,27 @@ Returns a paginated list of athletes.
 |-----------|------|---------|-------------|
 | page | int | 0 | Zero-based page index |
 | size | int | 10 | Number of records per page |
+| firstName | String | — | Partial, case-insensitive match on first name |
+| lastName | String | — | Partial, case-insensitive match on last name |
+| homeCity | String | — | Partial, case-insensitive match on home city |
+| homeState | String | — | Exact match on home state code (e.g. `CA`, `TX`) |
+| homeCountry | String | — | Exact match on home country code (e.g. `USA`, `CAN`) |
+| clubName | String | — | Partial, case-insensitive match on club name |
+| collegeCodeName | String | — | Exact match on college code name; returns athletes who appeared on that college's roster in any season |
+| seasonYear | Short | — | Filters to athletes who appeared on any roster in this season year (e.g. `2024`) |
+| academicYear | String | — | Filters by academic standing (e.g. `SR`, `Junior`); requires `seasonYear` |
+
+**Validation**
+
+- `academicYear` requires `seasonYear` to be present; omitting `seasonYear` while providing `academicYear` returns `400 Bad Request`
+- Invalid values for `homeState`, `homeCountry`, or `academicYear` return `400 Bad Request`
 
 **Responses**
 
 | Status | Description |
 |--------|-------------|
 | 200 OK | Paginated result; returns a HATEOAS `PagedModel` containing a list of [Athlete](#athlete-object) objects under the `content` key |
+| 400 Bad Request | Invalid filter parameter value |
 
 ---
 

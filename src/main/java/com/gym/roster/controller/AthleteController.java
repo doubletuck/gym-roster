@@ -1,6 +1,7 @@
 package com.gym.roster.controller;
 
 import com.gym.roster.domain.Athlete;
+import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.service.AthleteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -71,9 +72,21 @@ public class AthleteController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<Athlete>>> getPaginatedEntities(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String homeCity,
+            @RequestParam(required = false) String homeState,
+            @RequestParam(required = false) String homeCountry,
+            @RequestParam(required = false) String clubName,
+            @RequestParam(required = false) String collegeCodeName,
+            @RequestParam(required = false) Short seasonYear,
+            @RequestParam(required = false) String academicYear) {
         Pageable pageable = PageRequest.of(page, size);
-        Page<Athlete> athletes = athleteService.getPaginatedEntities(pageable);
+        AthleteFilterParams filterParams = new AthleteFilterParams(
+                firstName, lastName, homeCity, homeState, homeCountry,
+                clubName, collegeCodeName, seasonYear, academicYear);
+        Page<Athlete> athletes = athleteService.getPaginatedEntities(filterParams, pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(athletes));
     }
 }
