@@ -6,8 +6,8 @@ import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.service.AthleteService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.data.web.PagedResourcesAssembler;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.hateoas.PagedModel;
@@ -72,8 +72,7 @@ public class AthleteController {
 
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<AthleteDto>>> getPaginatedEntities(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
+            @PageableDefault(size = 10) Pageable pageable,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String homeCity,
@@ -83,7 +82,6 @@ public class AthleteController {
             @RequestParam(required = false) String collegeCodeName,
             @RequestParam(required = false) Short seasonYear,
             @RequestParam(required = false) String academicYear) {
-        Pageable pageable = PageRequest.of(page, size);
         AthleteFilterParams filterParams = new AthleteFilterParams(
                 firstName, lastName, homeCity, homeState, homeCountry,
                 clubName, collegeCodeName, seasonYear, academicYear);
