@@ -10,7 +10,7 @@ Manages individual athlete records. An athlete represents a person who competes 
 
 ### GET /athlete/{id}
 
-Returns a single athlete by ID.
+Returns a single athlete by ID, including all roster entries for that athlete.
 
 **Path Parameters**
 
@@ -22,14 +22,14 @@ Returns a single athlete by ID.
 
 | Status | Description |
 |--------|-------------|
-| 200 OK | Athlete found; returns [Athlete](#athlete-object) |
+| 200 OK | Athlete found; returns [AthleteDto](#athletedto-object) |
 | 404 Not Found | No athlete with the given ID |
 
 ---
 
 ### GET /athlete
 
-Returns a paginated, filtered list of athletes. All filter parameters are optional and may be combined freely. Omitting all filter parameters returns all athletes.
+Returns a paginated, filtered list of athletes, each including their roster entries. All filter parameters are optional and may be combined freely. Omitting all filter parameters returns all athletes.
 
 **Query Parameters**
 
@@ -56,7 +56,7 @@ Returns a paginated, filtered list of athletes. All filter parameters are option
 
 | Status | Description |
 |--------|-------------|
-| 200 OK | Paginated result; returns a HATEOAS `PagedModel` containing a list of [Athlete](#athlete-object) objects under the `content` key |
+| 200 OK | Paginated result; returns a HATEOAS `PagedModel` containing a list of [AthleteDto](#athletedto-object) objects under the `content` key |
 | 400 Bad Request | Invalid filter parameter value |
 
 ---
@@ -114,7 +114,74 @@ Deletes an athlete by ID.
 
 ---
 
+## AthleteDto Object
+
+Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athlete-object) fields plus a `rosters` collection.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| id | Long | Unique identifier |
+| firstName | String | Athlete's first name |
+| lastName | String | Athlete's last name |
+| homeCity | String | Athlete's home city |
+| homeState | String | 2-character state code (e.g. `CA`, `TX`) |
+| homeCountry | String | 3-character country code (e.g. `USA`, `CAN`) |
+| clubName | String | Name of the club team the athlete trains with |
+| creationTimestamp | Instant | ISO 8601 UTC timestamp of record creation |
+| lastUpdateTimestamp | Instant | ISO 8601 UTC timestamp of last update |
+| rosters | Array of [RosterEntry](#rosterentry-object) | All roster entries for this athlete across all colleges and seasons; empty array if none |
+
+**Example**
+
+```json
+{
+  "id": 42,
+  "firstName": "Jordan",
+  "lastName": "Smith",
+  "homeCity": "Austin",
+  "homeState": "TX",
+  "homeCountry": "USA",
+  "clubName": "Texas Twisters",
+  "creationTimestamp": "2024-08-01T12:00:00Z",
+  "lastUpdateTimestamp": "2024-08-01T12:00:00Z",
+  "rosters": [
+    {
+      "collegeCodeName": "UCLA",
+      "collegeShortName": "UCLA",
+      "collegeLongName": "University of California, Los Angeles",
+      "seasonYear": 2024,
+      "academicYear": "SO"
+    },
+    {
+      "collegeCodeName": "UCLA",
+      "collegeShortName": "UCLA",
+      "collegeLongName": "University of California, Los Angeles",
+      "seasonYear": 2023,
+      "academicYear": "FR"
+    }
+  ]
+}
+```
+
+---
+
+## RosterEntry Object
+
+Represents a single season on a college roster. Nested within [AthleteDto](#athletedto-object).
+
+| Field | Type | Description |
+|-------|------|-------------|
+| collegeCodeName | String | College code name (e.g. `UCLA`) |
+| collegeShortName | String | College short name (e.g. `UCLA`) |
+| collegeLongName | String | College full name (e.g. `University of California, Los Angeles`) |
+| seasonYear | Short | Season year (e.g. `2024`) |
+| academicYear | String | Athlete's academic standing that season (e.g. `FR`, `SO`, `JR`, `SR`) |
+
+---
+
 ## Athlete Object
+
+Used as the request and response body for `POST /athlete` and `PUT /athlete/{id}`.
 
 | Field | Type | Required | Constraints | Description |
 |-------|------|----------|-------------|-------------|

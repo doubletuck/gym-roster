@@ -1,6 +1,7 @@
 package com.gym.roster.controller;
 
 import com.gym.roster.domain.Athlete;
+import com.gym.roster.dto.AthleteDto;
 import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.service.AthleteService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,17 +28,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class AthleteController {
 
     private final AthleteService athleteService;
-    private final PagedResourcesAssembler<Athlete> pagedResourcesAssembler;
+    private final PagedResourcesAssembler<AthleteDto> pagedResourcesAssembler;
 
     @Autowired
-    public AthleteController(AthleteService athleteService, PagedResourcesAssembler<Athlete> pagedResourcesAssembler) {
+    public AthleteController(AthleteService athleteService, PagedResourcesAssembler<AthleteDto> pagedResourcesAssembler) {
         this.athleteService = athleteService;
         this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Athlete> findById(@PathVariable Long id) {
-        return athleteService.findById(id)
+    public ResponseEntity<AthleteDto> findById(@PathVariable Long id) {
+        return athleteService.findDtoById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -70,7 +71,7 @@ public class AthleteController {
     }
 
     @GetMapping
-    public ResponseEntity<PagedModel<EntityModel<Athlete>>> getPaginatedEntities(
+    public ResponseEntity<PagedModel<EntityModel<AthleteDto>>> getPaginatedEntities(
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(required = false) String firstName,
@@ -86,7 +87,7 @@ public class AthleteController {
         AthleteFilterParams filterParams = new AthleteFilterParams(
                 firstName, lastName, homeCity, homeState, homeCountry,
                 clubName, collegeCodeName, seasonYear, academicYear);
-        Page<Athlete> athletes = athleteService.getPaginatedEntities(filterParams, pageable);
+        Page<AthleteDto> athletes = athleteService.getPaginatedEntities(filterParams, pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(athletes));
     }
 }
