@@ -1,6 +1,7 @@
 package com.gym.roster.dto;
 
 public record AthleteFilterParams(
+        String q,
         String firstName,
         String lastName,
         String homeCity,
