@@ -38,6 +38,7 @@ Returns a paginated, filtered list of athletes, each including their roster entr
 | page | int | 0 | Zero-based page index |
 | size | int | 10 | Number of records per page |
 | sort | String | — | Sort field and direction; may be repeated for multiple fields (e.g. `sort=lastName,asc&sort=firstName,asc`) |
+| q | String | — | Free-text search; case-insensitive partial match against `firstName`, `lastName`, `clubName`, and college name; ANDs with any other filters present |
 | firstName | String | — | Partial, case-insensitive match on first name |
 | lastName | String | — | Partial, case-insensitive match on last name |
 | homeCity | String | — | Partial, case-insensitive match on home city |

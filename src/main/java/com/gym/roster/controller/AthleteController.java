@@ -73,6 +73,7 @@ public class AthleteController {
     @GetMapping
     public ResponseEntity<PagedModel<EntityModel<AthleteDto>>> getPaginatedEntities(
             @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) String q,
             @RequestParam(required = false) String firstName,
             @RequestParam(required = false) String lastName,
             @RequestParam(required = false) String homeCity,
@@ -83,7 +84,7 @@ public class AthleteController {
             @RequestParam(required = false) Short seasonYear,
             @RequestParam(required = false) String academicYear) {
         AthleteFilterParams filterParams = new AthleteFilterParams(
-                firstName, lastName, homeCity, homeState, homeCountry,
+                q, firstName, lastName, homeCity, homeState, homeCountry,
                 clubName, collegeCodeName, seasonYear, academicYear);
         Page<AthleteDto> athletes = athleteService.getPaginatedEntities(filterParams, pageable);
         return ResponseEntity.ok(pagedResourcesAssembler.toModel(athletes));

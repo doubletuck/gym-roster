@@ -23,13 +23,13 @@ public class AthleteSpecification {
             List<Predicate> predicates = new ArrayList<>();
 
             if (hasValue(params.firstName())) {
-                predicates.add(cb.like(cb.lower(root.get("firstName")), like(params.firstName())));
+                predicates.add(cb.like(cb.lower(root.get("firstName")), like(params.firstName()), ESCAPE_CHAR));
             }
             if (hasValue(params.lastName())) {
-                predicates.add(cb.like(cb.lower(root.get("lastName")), like(params.lastName())));
+                predicates.add(cb.like(cb.lower(root.get("lastName")), like(params.lastName()), ESCAPE_CHAR));
             }
             if (hasValue(params.homeCity())) {
-                predicates.add(cb.like(cb.lower(root.get("homeCity")), like(params.homeCity())));
+                predicates.add(cb.like(cb.lower(root.get("homeCity")), like(params.homeCity()), ESCAPE_CHAR));
             }
             if (hasValue(params.homeState())) {
                 State state = State.find(params.homeState());
@@ -46,7 +46,27 @@ public class AthleteSpecification {
                 predicates.add(cb.equal(root.get("homeCountry"), country));
             }
             if (hasValue(params.clubName())) {
-                predicates.add(cb.like(cb.lower(root.get("clubName")), like(params.clubName())));
+                predicates.add(cb.like(cb.lower(root.get("clubName")), like(params.clubName()), ESCAPE_CHAR));
+            }
+
+            if (hasValue(params.q())) {
+                String pattern = like(params.q());
+                Subquery<AthleteRoster> collegeSub = query.subquery(AthleteRoster.class);
+                Root<AthleteRoster> collegeRoster = collegeSub.from(AthleteRoster.class);
+                collegeSub.select(collegeRoster);
+                collegeSub.where(
+                        cb.equal(collegeRoster.get("athlete"), root),
+                        cb.or(
+                                cb.like(cb.lower(collegeRoster.get("college").get("shortName")), pattern, ESCAPE_CHAR),
+                                cb.like(cb.lower(collegeRoster.get("college").get("longName")), pattern, ESCAPE_CHAR)
+                        )
+                );
+                predicates.add(cb.or(
+                        cb.like(cb.lower(root.get("firstName")), pattern, ESCAPE_CHAR),
+                        cb.like(cb.lower(root.get("lastName")), pattern, ESCAPE_CHAR),
+                        cb.like(cb.lower(root.get("clubName")), pattern, ESCAPE_CHAR),
+                        cb.exists(collegeSub)
+                ));
             }
 
             if (hasValue(params.collegeCodeName()) || params.seasonYear() != null) {
@@ -83,7 +103,13 @@ public class AthleteSpecification {
         return value != null && !value.isBlank();
     }
 
+    private static final char ESCAPE_CHAR = '\\';
+
     private static String like(String value) {
-        return "%" + value.toLowerCase().trim() + "%";
+        String escaped = value.toLowerCase().trim()
+                .replace("\\", "\\\\")
+                .replace("%", "\\%")
+                .replace("_", "\\_");
+        return "%" + escaped + "%";
     }
 }
