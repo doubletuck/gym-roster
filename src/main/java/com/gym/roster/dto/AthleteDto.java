@@ -21,23 +21,20 @@ public record AthleteDto(
         State homeState,
         Country homeCountry,
         String clubName,
-        List<RosterEntry> rosters
-) {
-    public record RosterEntry(
+        List<AthleteRosterEntry> rosters) {
+    public record AthleteRosterEntry(
             String collegeCodeName,
             String collegeShortName,
             String collegeLongName,
             Short seasonYear,
-            AcademicYear academicYear
-    ) {
-        public static RosterEntry from(AthleteRoster roster) {
-            return new RosterEntry(
+            AcademicYear academicYear) {
+        public static AthleteRosterEntry from(AthleteRoster roster) {
+            return new AthleteRosterEntry(
                     roster.getCollege().getCodeName(),
                     roster.getCollege().getShortName(),
                     roster.getCollege().getLongName(),
                     roster.getSeasonYear(),
-                    roster.getAcademicYear()
-            );
+                    roster.getAcademicYear());
         }
     }
 
@@ -52,7 +49,6 @@ public record AthleteDto(
                 athlete.getHomeState(),
                 athlete.getHomeCountry(),
                 athlete.getClubName(),
-                rosters.stream().map(RosterEntry::from).toList()
-        );
+                rosters.stream().map(AthleteRosterEntry::from).toList());
     }
 }
