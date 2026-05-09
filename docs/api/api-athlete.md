@@ -67,7 +67,7 @@ Returns a paginated, filtered list of athletes, each including their roster entr
 
 Creates a new athlete.
 
-**Request Body** — [Athlete](#athlete-object) (JSON)
+**Request Body** — [AthleteRequest](#athleterequest-object) (JSON)
 
 **Responses**
 
@@ -87,7 +87,7 @@ Updates an existing athlete. Replaces `clubName`, `firstName`, `lastName`, `home
 | --------- | ---- | ----------- |
 | id        | Long | Athlete ID  |
 
-**Request Body** — [Athlete](#athlete-object) (JSON)
+**Request Body** — [AthleteRequest](#athleterequest-object) (JSON)
 
 **Responses**
 
@@ -181,23 +181,51 @@ Represents a single season on a college roster. Nested within [AthleteDto](#athl
 
 ---
 
-## Athlete Object
+## AthleteRequest Object
 
-Used as the request and response body for `POST /athlete` and `PUT /athlete/{id}`.
+Request body for `POST /athlete` and `PUT /athlete/{id}`.
 
-| Field               | Type    | Required | Constraints                                  | Description                                   |
-| ------------------- | ------- | -------- | -------------------------------------------- | --------------------------------------------- |
-| id                  | Long    | —        | Auto-generated                               | Unique identifier                             |
-| firstName           | String  | Yes      | Max 40 characters                            | Athlete's first name                          |
-| lastName            | String  | Yes      | Max 40 characters                            | Athlete's last name                           |
-| homeCity            | String  | Yes      | Max 50 characters                            | Athlete's home city                           |
-| homeState           | String  | No       | 2-character state code (e.g. `CA`, `TX`)     | Athlete's home state                          |
-| homeCountry         | String  | No       | 3-character country code (e.g. `USA`, `CAN`) | Athlete's home country                        |
-| clubName            | String  | No       | Max 100 characters                           | Name of the club team the athlete trains with |
-| creationTimestamp   | Instant | —        | Auto-set on create                           | ISO 8601 UTC timestamp of record creation     |
-| lastUpdateTimestamp | Instant | —        | Auto-set on create/update                    | ISO 8601 UTC timestamp of last update         |
+| Field       | Type   | Required | Constraints                                  | Description                                   |
+| ----------- | ------ | -------- | -------------------------------------------- | --------------------------------------------- |
+| firstName   | String | Yes      | Max 40 characters                            | Athlete's first name                          |
+| lastName    | String | Yes      | Max 40 characters                            | Athlete's last name                           |
+| homeCity    | String | Yes      | Max 50 characters                            | Athlete's home city                           |
+| homeState   | String | No       | 2-character state code (e.g. `CA`, `TX`)     | Athlete's home state                          |
+| homeCountry | String | No       | 3-character country code (e.g. `USA`, `CAN`) | Athlete's home country                        |
+| clubName    | String | No       | Max 100 characters                           | Name of the club team the athlete trains with |
 
 **Unique constraint:** `firstName` + `lastName` + `homeCity`
+
+**Example**
+
+```json
+{
+  "firstName": "Jordan",
+  "lastName": "Smith",
+  "homeCity": "Austin",
+  "homeState": "TX",
+  "homeCountry": "USA",
+  "clubName": "Texas Twisters"
+}
+```
+
+---
+
+## Athlete Object
+
+Returned by `POST /athlete` and `PUT /athlete/{id}`.
+
+| Field               | Type    | Description                                   |
+| ------------------- | ------- | --------------------------------------------- |
+| id                  | Long    | Unique identifier                             |
+| firstName           | String  | Athlete's first name                          |
+| lastName            | String  | Athlete's last name                           |
+| homeCity            | String  | Athlete's home city                           |
+| homeState           | String  | 2-character state code (e.g. `CA`, `TX`)      |
+| homeCountry         | String  | 3-character country code (e.g. `USA`, `CAN`)  |
+| clubName            | String  | Name of the club team the athlete trains with |
+| creationTimestamp   | Instant | ISO 8601 UTC timestamp of record creation     |
+| lastUpdateTimestamp | Instant | ISO 8601 UTC timestamp of last update         |
 
 **Example**
 

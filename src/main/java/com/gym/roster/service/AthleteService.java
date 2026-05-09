@@ -4,6 +4,7 @@ import com.gym.roster.domain.Athlete;
 import com.gym.roster.domain.AthleteRoster;
 import com.gym.roster.dto.AthleteDto;
 import com.gym.roster.dto.AthleteFilterParams;
+import com.gym.roster.dto.AthleteRequest;
 import com.gym.roster.repository.AthleteRepository;
 import com.gym.roster.repository.AthleteRosterRepository;
 import com.gym.roster.specification.AthleteSpecification;
@@ -40,6 +41,30 @@ public class AthleteService {
 
     public Athlete findByNameAndHomeCity(String firstName, String lastName, String homeCity) {
         return athleteRepository.findByNameAndHomeCity(firstName, lastName, homeCity);
+    }
+
+    public Athlete create(AthleteRequest request) {
+        Athlete athlete = new Athlete();
+        athlete.setFirstName(request.firstName());
+        athlete.setLastName(request.lastName());
+        athlete.setHomeCity(request.homeCity());
+        athlete.setHomeState(request.homeState());
+        athlete.setHomeCountry(request.homeCountry());
+        athlete.setClubName(request.clubName());
+        return athleteRepository.save(athlete);
+    }
+
+    public Optional<Athlete> update(Long id, AthleteRequest request) {
+        return athleteRepository.findById(id)
+                .map(existing -> {
+                    existing.setFirstName(request.firstName());
+                    existing.setLastName(request.lastName());
+                    existing.setHomeCity(request.homeCity());
+                    existing.setHomeState(request.homeState());
+                    existing.setHomeCountry(request.homeCountry());
+                    existing.setClubName(request.clubName());
+                    return athleteRepository.save(existing);
+                });
     }
 
     public Athlete save(Athlete athlete) {

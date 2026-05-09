@@ -3,7 +3,9 @@ package com.gym.roster.controller;
 import com.gym.roster.domain.Athlete;
 import com.gym.roster.dto.AthleteDto;
 import com.gym.roster.dto.AthleteFilterParams;
+import com.gym.roster.dto.AthleteRequest;
 import com.gym.roster.service.AthleteService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -44,23 +46,15 @@ public class AthleteController {
     }
 
     @PostMapping
-    public ResponseEntity<Athlete> create(@RequestBody Athlete athlete) {
-        Athlete createdAthlete = athleteService.save(athlete);
+    public ResponseEntity<Athlete> create(@Valid @RequestBody AthleteRequest request) {
+        Athlete createdAthlete = athleteService.create(request);
         return new ResponseEntity<>(createdAthlete, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Athlete> update(@PathVariable Long id, @RequestBody Athlete athlete) {
-        return athleteService.findById(id)
-                .map(existingAthlete -> {
-                    existingAthlete.setClubName(athlete.getClubName());
-                    existingAthlete.setFirstName(athlete.getFirstName());
-                    existingAthlete.setLastName(athlete.getLastName());
-                    existingAthlete.setHomeCountry(athlete.getHomeCountry());
-                    existingAthlete.setHomeState(athlete.getHomeState());
-                    existingAthlete.setHomeCity(athlete.getHomeCity());
-                    return ResponseEntity.ok(athleteService.save(existingAthlete));
-                })
+    public ResponseEntity<Athlete> update(@PathVariable Long id, @Valid @RequestBody AthleteRequest request) {
+        return athleteService.update(id, request)
+                .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
