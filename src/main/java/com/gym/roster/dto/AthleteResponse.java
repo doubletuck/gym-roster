@@ -11,7 +11,7 @@ import java.time.Instant;
 import java.util.List;
 
 @Relation(collectionRelation = "content")
-public record AthleteDto(
+public record AthleteResponse(
         Long id,
         Instant creationTimestamp,
         Instant lastUpdateTimestamp,
@@ -38,8 +38,8 @@ public record AthleteDto(
         }
     }
 
-    public static AthleteDto from(Athlete athlete, List<AthleteRoster> rosters) {
-        return new AthleteDto(
+    public static AthleteResponse from(Athlete athlete, List<AthleteRoster> rosters) {
+        return new AthleteResponse(
                 athlete.getId(),
                 athlete.getCreationTimestamp(),
                 athlete.getLastUpdateTimestamp(),

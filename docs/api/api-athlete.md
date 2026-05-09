@@ -20,10 +20,10 @@ Returns a single athlete by ID, including all roster entries for that athlete.
 
 **Responses**
 
-| Status        | Description                                             |
-| ------------- | ------------------------------------------------------- |
-| 200 OK        | Athlete found; returns [AthleteDto](#athletedto-object) |
-| 404 Not Found | No athlete with the given ID                            |
+| Status        | Description                                                       |
+| ------------- | ----------------------------------------------------------------- |
+| 200 OK        | Athlete found; returns [AthleteResponse](#athleteresponse-object) |
+| 404 Not Found | No athlete with the given ID                                      |
 
 ---
 
@@ -56,10 +56,10 @@ Returns a paginated, filtered list of athletes, each including their roster entr
 
 **Responses**
 
-| Status          | Description                                                                                                                            |
-| --------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
-| 200 OK          | Paginated result; returns a HATEOAS `PagedModel` containing a list of [AthleteDto](#athletedto-object) objects under the `content` key |
-| 400 Bad Request | Invalid filter parameter value                                                                                                         |
+| Status          | Description                                                                                                                                      |
+| --------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 200 OK          | Paginated result; returns a HATEOAS `PagedModel` containing a list of [AthleteResponse](#AthleteResponse-object) objects under the `content` key |
+| 400 Bad Request | Invalid filter parameter value                                                                                                                   |
 
 ---
 
@@ -116,7 +116,7 @@ Deletes an athlete by ID.
 
 ---
 
-## AthleteDto Object
+## AthleteResponse Object
 
 Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athlete-object) fields plus a `rosters` collection.
 
@@ -169,7 +169,7 @@ Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athl
 
 ## AthleteRosterEntry Object
 
-Represents a single season on a college roster. Nested within [AthleteDto](#athletedto-object).
+Represents a single season on a college roster. Nested within [AthleteResponse](#AthleteResponse-object).
 
 | Field            | Type   | Description                                                           |
 | ---------------- | ------ | --------------------------------------------------------------------- |

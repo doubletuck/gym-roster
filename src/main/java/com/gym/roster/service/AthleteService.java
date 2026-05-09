@@ -2,7 +2,7 @@ package com.gym.roster.service;
 
 import com.gym.roster.domain.Athlete;
 import com.gym.roster.domain.AthleteRoster;
-import com.gym.roster.dto.AthleteDto;
+import com.gym.roster.dto.AthleteResponse;
 import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.dto.AthleteRequest;
 import com.gym.roster.repository.AthleteRepository;
@@ -34,9 +34,9 @@ public class AthleteService {
         return athleteRepository.findById(id);
     }
 
-    public Optional<AthleteDto> findDtoById(Long id) {
+    public Optional<AthleteResponse> findDtoById(Long id) {
         return athleteRepository.findById(id)
-                .map(athlete -> AthleteDto.from(athlete, athleteRosterRepository.findByAthlete(athlete)));
+                .map(athlete -> AthleteResponse.from(athlete, athleteRosterRepository.findByAthlete(athlete)));
     }
 
     public Athlete findByNameAndHomeCity(String firstName, String lastName, String homeCity) {
@@ -75,7 +75,7 @@ public class AthleteService {
         athleteRepository.deleteById(id);
     }
 
-    public Page<AthleteDto> getPaginatedEntities(AthleteFilterParams params, Pageable pageable) {
+    public Page<AthleteResponse> getPaginatedEntities(AthleteFilterParams params, Pageable pageable) {
         if (params.academicYear() != null && !params.academicYear().isBlank() && params.seasonYear() == null) {
             throw new IllegalArgumentException("academicYear requires seasonYear");
         }
@@ -84,7 +84,7 @@ public class AthleteService {
         Map<Long, List<AthleteRoster>> rostersByAthleteId = athleteRosterRepository.findByAthleteIn(athletes)
                 .stream()
                 .collect(Collectors.groupingBy(r -> r.getAthlete().getId()));
-        return athletePage.map(athlete ->
-                AthleteDto.from(athlete, rostersByAthleteId.getOrDefault(athlete.getId(), List.of())));
+        return athletePage.map(
+                athlete -> AthleteResponse.from(athlete, rostersByAthleteId.getOrDefault(athlete.getId(), List.of())));
     }
 }
