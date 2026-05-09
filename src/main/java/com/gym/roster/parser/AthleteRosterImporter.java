@@ -7,7 +7,6 @@ import com.gym.roster.domain.College;
 import com.gym.roster.domain.AthleteRoster;
 import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
-import com.gym.roster.service.AthleteRosterService;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
@@ -26,17 +25,14 @@ public class AthleteRosterImporter extends AbstractImporter<AthleteRosterImportR
 
     private final CollegeService collegeService;
     private final AthleteService athleteService;
-    private final AthleteRosterService athleteRosterService;
 
     private File file;
     private AthleteRosterImportResult currentImportResult;
     private final List<AthleteRosterImportResult> importResults = new ArrayList<>();
 
-    public AthleteRosterImporter(CollegeService collegeService, AthleteService athleteService,
-            AthleteRosterService athleteRosterService) {
+    public AthleteRosterImporter(CollegeService collegeService, AthleteService athleteService) {
         this.collegeService = collegeService;
         this.athleteService = athleteService;
-        this.athleteRosterService = athleteRosterService;
     }
 
     public enum Headers {
@@ -166,7 +162,7 @@ public class AthleteRosterImporter extends AbstractImporter<AthleteRosterImportR
         AcademicYear academicYear = AcademicYear.find(record.get(Headers.ACADEMIC_YEAR));
         String event = record.get(Headers.EVENT).isBlank() ? null : record.get(Headers.EVENT);
 
-        AthleteRoster roster = athleteRosterService.findByYearCollegeAndAthlete(seasonYear, college, athlete);
+        AthleteRoster roster = athleteService.findRosterByYearCollegeAndAthlete(seasonYear, college, athlete);
         if (roster == null) {
             roster = new AthleteRoster();
             roster.setCollege(college);
@@ -175,7 +171,7 @@ public class AthleteRosterImporter extends AbstractImporter<AthleteRosterImportR
             roster.setAcademicYear(academicYear);
             roster.setEvents(event);
             try {
-                roster = athleteRosterService.save(roster);
+                roster = athleteService.save(roster);
                 currentImportResult.setRosterImportStatus(ImportResultStatus.CREATED);
                 logger.info("AthleteRoster Import {} - Record {} - AthleteRoster created: {}", file.getName(),
                         record.getRecordNumber(), roster);

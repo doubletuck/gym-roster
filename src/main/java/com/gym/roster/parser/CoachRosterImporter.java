@@ -4,7 +4,6 @@ import com.doubletuck.gym.common.model.StaffRole;
 import com.gym.roster.domain.Coach;
 import com.gym.roster.domain.CoachRoster;
 import com.gym.roster.domain.College;
-import com.gym.roster.service.CoachRosterService;
 import com.gym.roster.service.CoachService;
 import com.gym.roster.service.CollegeService;
 import org.apache.commons.csv.CSVFormat;
@@ -25,16 +24,14 @@ public class CoachRosterImporter extends AbstractImporter<CoachRosterImportResul
 
     private final CollegeService collegeService;
     private final CoachService coachService;
-    private final CoachRosterService coachRosterService;
 
     private File file;
     private CoachRosterImportResult currentImportResult;
     private final List<CoachRosterImportResult> importResults = new ArrayList<>();
 
-    public CoachRosterImporter(CollegeService collegeService, CoachService coachService, CoachRosterService coachRosterService) {
+    public CoachRosterImporter(CollegeService collegeService, CoachService coachService) {
         this.collegeService = collegeService;
         this.coachService = coachService;
-        this.coachRosterService = coachRosterService;
     }
 
     public enum Headers {
@@ -139,7 +136,7 @@ public class CoachRosterImporter extends AbstractImporter<CoachRosterImportResul
         Short seasonYear = Short.parseShort(record.get(Headers.YEAR));
         StaffRole role = StaffRole.find(record.get(Headers.ROLE));
 
-        CoachRoster roster = coachRosterService.findByYearAndCollegeAndCoach(seasonYear, college, coach);
+        CoachRoster roster = coachService.findRosterByYearAndCollegeAndCoach(seasonYear, college, coach);
         if (roster == null) {
             roster = new CoachRoster();
             roster.setCollege(college);
@@ -147,7 +144,7 @@ public class CoachRosterImporter extends AbstractImporter<CoachRosterImportResul
             roster.setCoach(coach);
             roster.setRoleCode(role);
             try {
-                roster = coachRosterService.save(roster);
+                roster = coachService.save(roster);
                 currentImportResult.setRosterImportStatus(ImportResultStatus.CREATED);
                 logger.info("CoachRoster Import {} - Record {} - CoachRoster created: {}", file.getName(),
                         record.getRecordNumber(), roster);

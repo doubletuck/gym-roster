@@ -5,7 +5,7 @@ import com.gym.roster.domain.AthleteRoster;
 import com.gym.roster.domain.Meet;
 import com.gym.roster.domain.MeetScore;
 import com.gym.roster.domain.MeetScoreDetail;
-import com.gym.roster.service.AthleteRosterService;
+import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
 import com.gym.roster.service.MeetService;
 import org.apache.commons.csv.CSVFormat;
@@ -29,7 +29,7 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
     private final static Logger logger = LoggerFactory.getLogger(MeetImporter.class);
 
     private final CollegeService collegeService;
-    private final AthleteRosterService athleteRosterService;
+    private final AthleteService athleteService;
     private final MeetService meetService;
 
     private File file;
@@ -40,10 +40,10 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
     private Meet meet;
 
     public MeetImporter(CollegeService collegeService,
-            AthleteRosterService athleteRosterService,
+            AthleteService athleteService,
             MeetService meetService) {
         this.collegeService = collegeService;
-        this.athleteRosterService = athleteRosterService;
+        this.athleteService = athleteService;
         this.meetService = meetService;
     }
 
@@ -162,7 +162,7 @@ public class MeetImporter extends AbstractImporter<MeetImportResult> {
         String[] athleteNameArray = parseName(athleteName);
 
         try {
-            return athleteRosterService.findByYearCollegeNameAndAthleteName((short) seasonYear, collegeCodeName,
+            return athleteService.findRosterByYearCollegeNameAndAthleteName((short) seasonYear, collegeCodeName,
                     athleteNameArray[0], athleteNameArray[1]);
         } catch (Exception e) {
             logger.error(

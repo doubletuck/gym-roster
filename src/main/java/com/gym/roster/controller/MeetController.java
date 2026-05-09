@@ -2,7 +2,7 @@ package com.gym.roster.controller;
 
 import com.gym.roster.parser.MeetImportResult;
 import com.gym.roster.parser.MeetImporter;
-import com.gym.roster.service.AthleteRosterService;
+import com.gym.roster.service.AthleteService;
 import com.gym.roster.service.CollegeService;
 import com.gym.roster.service.MeetService;
 import org.slf4j.Logger;
@@ -25,19 +25,19 @@ public class MeetController {
 
     private final CollegeService collegeService;
     private final MeetService meetService;
-    private final AthleteRosterService athleteRosterService;
+    private final AthleteService athleteService;
 
     @Autowired
-    public MeetController(CollegeService collegeService, MeetService meetService, AthleteRosterService athleteRosterService) {
+    public MeetController(CollegeService collegeService, MeetService meetService, AthleteService athleteService) {
         this.collegeService = collegeService;
         this.meetService = meetService;
-        this.athleteRosterService = athleteRosterService;
+        this.athleteService = athleteService;
     }
 
     @PostMapping("/file-import")
     public ResponseEntity<List<MeetImportResult>> importMeetFromFile(@RequestParam MultipartFile file) {
         try {
-            MeetImporter importer = new MeetImporter(collegeService, athleteRosterService, meetService);
+            MeetImporter importer = new MeetImporter(collegeService, athleteService, meetService);
             List<MeetImportResult> results = importer.parseFile(file);
             return ResponseEntity.ok(results);
         } catch (Exception e) {

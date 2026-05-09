@@ -2,6 +2,7 @@ package com.gym.roster.service;
 
 import com.gym.roster.domain.Athlete;
 import com.gym.roster.domain.AthleteRoster;
+import com.gym.roster.domain.College;
 import com.gym.roster.dto.AthleteResponse;
 import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.dto.AthleteRequest;
@@ -73,6 +74,39 @@ public class AthleteService {
 
     public void deleteById(Long id) {
         athleteRepository.deleteById(id);
+    }
+
+    public List<AthleteRoster> findAllRosters() {
+        return athleteRosterRepository.findAll();
+    }
+
+    public Optional<AthleteRoster> findRosterById(Long id) {
+        return athleteRosterRepository.findById(id);
+    }
+
+    public AthleteRoster findRosterByYearCollegeAndAthlete(Short seasonYear, College college, Athlete athlete) {
+        return athleteRosterRepository.findByYearCollegeAndAthlete(seasonYear, college, athlete);
+    }
+
+    public AthleteRoster findRosterByYearCollegeNameAndAthleteName(
+            Short seasonYear,
+            String collegeName,
+            String athleteFirstName,
+            String athleteLastName) {
+        return athleteRosterRepository.findByYearCollegeNameAndAthleteName(seasonYear, collegeName, athleteFirstName,
+                athleteLastName);
+    }
+
+    public AthleteRoster save(AthleteRoster roster) {
+        return athleteRosterRepository.save(roster);
+    }
+
+    public void deleteRosterById(Long id) {
+        athleteRosterRepository.deleteById(id);
+    }
+
+    public Page<AthleteRoster> getPaginatedRosters(Pageable pageable) {
+        return athleteRosterRepository.findAll(pageable);
     }
 
     public Page<AthleteResponse> getPaginatedEntities(AthleteFilterParams params, Pageable pageable) {

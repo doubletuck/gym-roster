@@ -3,7 +3,6 @@ package com.gym.roster.controller;
 import com.gym.roster.domain.CoachRoster;
 import com.gym.roster.parser.CoachRosterImporter;
 import com.gym.roster.parser.CoachRosterImportResult;
-import com.gym.roster.service.CoachRosterService;
 import com.gym.roster.service.CoachService;
 import com.gym.roster.service.CollegeService;
 import org.slf4j.Logger;
@@ -28,27 +27,24 @@ public class CoachRosterController {
 
     private final static Logger logger = LoggerFactory.getLogger(CoachRosterController.class);
 
-    private final CoachRosterService coachRosterService;
     private final CollegeService collegeService;
     private final CoachService coachService;
 
     @Autowired
-    public CoachRosterController(CoachRosterService coachRosterService, CollegeService collegeService,
-            CoachService coachService) {
-        this.coachRosterService = coachRosterService;
+    public CoachRosterController(CollegeService collegeService, CoachService coachService) {
         this.collegeService = collegeService;
         this.coachService = coachService;
     }
 
     @PostMapping
     public ResponseEntity<CoachRoster> create(@RequestBody CoachRoster coachRoster) {
-        CoachRoster createdCoachRoster = coachRosterService.save(coachRoster);
+        CoachRoster createdCoachRoster = coachService.save(coachRoster);
         return ResponseEntity.ok(createdCoachRoster);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<CoachRoster> findById(@PathVariable Long id) {
-        return coachRosterService.findById(id)
+        return coachService.findRosterById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -57,12 +53,12 @@ public class CoachRosterController {
     public ResponseEntity<List<CoachRoster>> getCollegeCoachRosterForSeason(
             @PathVariable Short seasonYear,
             @PathVariable String collegeCodeName) {
-        return ResponseEntity.ok(coachRosterService.findByYearAndCollegeCode(seasonYear, collegeCodeName));
+        return ResponseEntity.ok(coachService.findRosterByYearAndCollegeCode(seasonYear, collegeCodeName));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable Long id) {
-        coachRosterService.deleteById(id);
+        coachService.deleteRosterById(id);
         return ResponseEntity.noContent().build();
     }
 
@@ -70,16 +66,15 @@ public class CoachRosterController {
     public ResponseEntity<Void> deleteCollegeCoachRosterForSeason(
             @PathVariable Short seasonYear,
             @PathVariable String collegeCodeName) {
-        coachRosterService.deleteByYearAndCollegeCodeName(seasonYear, collegeCodeName);
+        coachService.deleteRosterByYearAndCollegeCodeName(seasonYear, collegeCodeName);
         return ResponseEntity.noContent().build();
     }
 
     @PostMapping("/file-import")
     public ResponseEntity<List<CoachRosterImportResult>> importRosterFromFile(@RequestParam MultipartFile file) {
         try {
-            CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService,
-                    coachRosterService);
-            List<CoachRosterImportResult> results =importer.parseFile(file);
+            CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService);
+            List<CoachRosterImportResult> results = importer.parseFile(file);
             return ResponseEntity.ok(results);
         } catch (Exception e) {
             logger.error("Error importing coach roster file: {}", e.getMessage(), e);
@@ -90,8 +85,7 @@ public class CoachRosterController {
     @PostMapping("/directory-import")
     public ResponseEntity<Boolean> importRosterFromDirectory(@RequestParam String directoryPath) {
         try {
-            CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService,
-                    coachRosterService);
+            CoachRosterImporter importer = new CoachRosterImporter(collegeService, coachService);
             importer.parseDirectory(directoryPath);
             return ResponseEntity.ok(true);
         } catch (Exception e) {
