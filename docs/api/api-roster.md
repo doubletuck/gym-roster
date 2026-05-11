@@ -8,6 +8,48 @@ Manages team rosters for a given season. An athlete roster entry places an athle
 
 ## Athlete Roster Endpoints
 
+### POST /roster/athlete
+
+Creates a new athlete roster entry.
+
+**Request Body** — `AthleteRosterRequest` (JSON)
+
+| Field | Type | Required | Constraints | Description |
+|-------|------|----------|-------------|-------------|
+| collegeId | Long | Yes | Must reference an existing college | ID of the college |
+| athleteId | Long | Yes | Must reference an existing athlete | ID of the athlete |
+| seasonYear | Short | Yes | — | Four-digit season year (e.g. `2024`) |
+| academicYear | String | Yes | Academic year enum code | Athlete's academic standing (e.g. `FRESHMAN`, `SOPHOMORE`, `JUNIOR`, `SENIOR`) |
+| events | String | No | Max 20 characters | Event codes the athlete competes in |
+
+**Responses**
+
+| Status | Description |
+|--------|-------------|
+| 201 Created | Roster entry created; returns the new [AthleteRoster](#athleteroster-object) |
+| 404 Not Found | No college or athlete found for the given ID |
+| 400 Bad Request | Validation error on the request body |
+
+---
+
+### DELETE /roster/athlete/{id}
+
+Deletes an athlete roster entry by ID.
+
+**Path Parameters**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| id | Long | AthleteRoster ID |
+
+**Responses**
+
+| Status | Description |
+|--------|-------------|
+| 204 No Content | Entry deleted |
+
+---
+
 ### POST /roster/athlete/file-import
 
 Imports athlete roster entries from an uploaded file. Creates athlete and roster records that do not already exist.

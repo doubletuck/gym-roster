@@ -60,3 +60,12 @@ When modifying any controller, endpoint signature, request/response shape, or UR
 | `docs/api/api-coach.md` | `/coach` endpoints |
 | `docs/api/api-roster.md` | `/roster/athlete` and `/roster/coach` endpoints |
 | `docs/api/api-meet.md` | `/meet` endpoints |
+
+
+## Tests
+
+Tests are found in `test/java/`.
+
+- When adding a new capability, relevant tests should be added.
+- When modifying capability, impacted tests should be updated accordingly.
+- All test must run successfully.

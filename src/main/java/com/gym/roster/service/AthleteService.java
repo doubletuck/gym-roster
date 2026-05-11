@@ -1,11 +1,13 @@
 package com.gym.roster.service;
 
+import com.doubletuck.gym.common.model.AcademicYear;
 import com.gym.roster.domain.Athlete;
 import com.gym.roster.domain.AthleteRoster;
 import com.gym.roster.domain.College;
 import com.gym.roster.dto.AthleteResponse;
 import com.gym.roster.dto.AthleteFilterParams;
 import com.gym.roster.dto.AthleteRequest;
+import com.gym.roster.dto.AthleteRosterRequest;
 import com.gym.roster.repository.AthleteRepository;
 import com.gym.roster.repository.AthleteRosterRepository;
 import com.gym.roster.specification.AthleteSpecification;
@@ -24,11 +26,14 @@ public class AthleteService {
 
     private final AthleteRepository athleteRepository;
     private final AthleteRosterRepository athleteRosterRepository;
+    private final CollegeService collegeService;
 
     @Autowired
-    public AthleteService(AthleteRepository athleteRepository, AthleteRosterRepository athleteRosterRepository) {
+    public AthleteService(AthleteRepository athleteRepository, AthleteRosterRepository athleteRosterRepository,
+            CollegeService collegeService) {
         this.athleteRepository = athleteRepository;
         this.athleteRosterRepository = athleteRosterRepository;
+        this.collegeService = collegeService;
     }
 
     public Optional<Athlete> findById(Long id) {
@@ -66,6 +71,24 @@ public class AthleteService {
                     existing.setClubName(request.clubName());
                     return athleteRepository.save(existing);
                 });
+    }
+
+    public Optional<AthleteRoster> createRoster(AthleteRosterRequest request) {
+        Optional<College> college = collegeService.findById(request.collegeId());
+        if (college.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Athlete> athlete = athleteRepository.findById(request.athleteId());
+        if (athlete.isEmpty()) {
+            return Optional.empty();
+        }
+        AthleteRoster roster = new AthleteRoster();
+        roster.setCollege(college.get());
+        roster.setAthlete(athlete.get());
+        roster.setSeasonYear(request.seasonYear());
+        roster.setAcademicYear(AcademicYear.find(request.academicYear()));
+        roster.setEvents(request.events());
+        return Optional.of(athleteRosterRepository.save(roster));
     }
 
     public Athlete save(Athlete athlete) {

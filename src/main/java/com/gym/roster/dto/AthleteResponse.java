@@ -12,7 +12,7 @@ import java.util.List;
 
 @Relation(collectionRelation = "content")
 public record AthleteResponse(
-        Long id,
+        Long athleteId,
         Instant creationTimestamp,
         Instant lastUpdateTimestamp,
         String firstName,
@@ -23,6 +23,7 @@ public record AthleteResponse(
         String clubName,
         List<AthleteRosterEntry> rosters) {
     public record AthleteRosterEntry(
+            Long athleteRosterId,
             String collegeCodeName,
             String collegeShortName,
             String collegeLongName,
@@ -30,6 +31,7 @@ public record AthleteResponse(
             AcademicYear academicYear) {
         public static AthleteRosterEntry from(AthleteRoster roster) {
             return new AthleteRosterEntry(
+                    roster.getId(),
                     roster.getCollege().getCodeName(),
                     roster.getCollege().getShortName(),
                     roster.getCollege().getLongName(),

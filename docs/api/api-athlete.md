@@ -122,7 +122,7 @@ Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athl
 
 | Field               | Type                                                      | Description                                                                              |
 | ------------------- | --------------------------------------------------------- | ---------------------------------------------------------------------------------------- |
-| id                  | Long                                                      | Unique identifier                                                                        |
+| athleteId           | Long                                                      | The identifier that uniquely identifies the athlete                                                                      |
 | firstName           | String                                                    | Athlete's first name                                                                     |
 | lastName            | String                                                    | Athlete's last name                                                                      |
 | homeCity            | String                                                    | Athlete's home city                                                                      |
@@ -131,13 +131,13 @@ Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athl
 | clubName            | String                                                    | Name of the club team the athlete trains with                                            |
 | creationTimestamp   | Instant                                                   | ISO 8601 UTC timestamp of record creation                                                |
 | lastUpdateTimestamp | Instant                                                   | ISO 8601 UTC timestamp of last update                                                    |
-| rosters             | Array of [AthleteRosterEntry](#AthleteRosterEntry-object) | All roster entries for this athlete across all colleges and seasons; empty array if none |
+| rosters             | Array of [AthleteRosterEntry](#athleterosterentry-object) | All roster entries for this athlete across all colleges and seasons; empty array if none |
 
 **Example**
 
 ```json
 {
-  "id": 42,
+  "athleteId": 42,
   "firstName": "Jordan",
   "lastName": "Smith",
   "homeCity": "Austin",
@@ -148,6 +148,7 @@ Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athl
   "lastUpdateTimestamp": "2024-08-01T12:00:00Z",
   "rosters": [
     {
+      "athleteRosterId": 867,
       "collegeCodeName": "UCLA",
       "collegeShortName": "UCLA",
       "collegeLongName": "University of California, Los Angeles",
@@ -155,6 +156,7 @@ Returned by `GET /athlete/{id}` and `GET /athlete`. Contains all [Athlete](#athl
       "academicYear": "SO"
     },
     {
+      "athleteRosterId": 866,
       "collegeCodeName": "UCLA",
       "collegeShortName": "UCLA",
       "collegeLongName": "University of California, Los Angeles",
@@ -173,6 +175,7 @@ Represents a single season on a college roster. Nested within [AthleteResponse](
 
 | Field            | Type   | Description                                                           |
 | ---------------- | ------ | --------------------------------------------------------------------- |
+| athleteRosterId  | Long   | The identifier that uniquely identifes this roster entry              |
 | collegeCodeName  | String | College code name (e.g. `UCLA`)                                       |
 | collegeShortName | String | College short name (e.g. `UCLA`)                                      |
 | collegeLongName  | String | College full name (e.g. `University of California, Los Angeles`)      |
