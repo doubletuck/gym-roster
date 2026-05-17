@@ -220,6 +220,46 @@ class AthleteRosterRepositoryTest {
     }
 
     @Test
+    void testDeleteByAthleteId_DeletesAllRostersForAthlete() {
+        // Given: A second roster for the same athlete
+        AthleteRoster rosterNext = new AthleteRoster();
+        rosterNext.setSeasonYear((short) 2026);
+        rosterNext.setCollege(testCollege);
+        rosterNext.setAthlete(testAthlete);
+        rosterNext.setAcademicYear(AcademicYear.GR);
+        athleteRosterRepository.save(rosterNext);
+
+        // When: Deleting by athlete ID
+        athleteRosterRepository.deleteByAthleteId(testAthlete.getId());
+
+        // Then: All rosters for that athlete are deleted
+        assertTrue(athleteRosterRepository.findByAthlete(testAthlete).isEmpty());
+    }
+
+    @Test
+    void testDeleteByAthleteId_DoesNotDeleteRostersForOtherAthletes() {
+        // Given: Another athlete with their own roster
+        Athlete otherAthlete = new Athlete();
+        otherAthlete.setFirstName("Sarah");
+        otherAthlete.setLastName("Johnson");
+        otherAthlete.setHomeCity("San Francisco");
+        otherAthlete = athleteRepository.save(otherAthlete);
+
+        AthleteRoster otherRoster = new AthleteRoster();
+        otherRoster.setSeasonYear((short) 2025);
+        otherRoster.setCollege(testCollege);
+        otherRoster.setAthlete(otherAthlete);
+        otherRoster.setAcademicYear(AcademicYear.JR);
+        athleteRosterRepository.save(otherRoster);
+
+        // When: Deleting rosters for the first athlete
+        athleteRosterRepository.deleteByAthleteId(testAthlete.getId());
+
+        // Then: The other athlete's roster is unaffected
+        assertFalse(athleteRosterRepository.findByAthlete(otherAthlete).isEmpty());
+    }
+
+    @Test
     void testFindBySeasonYearCollegeNameAndAthleteNames_MultipleRostersForDifferentYears() {
         // Given: Another athlete roster for a different year
         AthleteRoster rosterNext = new AthleteRoster();

@@ -16,6 +16,8 @@ public interface AthleteRosterRepository extends JpaRepository<AthleteRoster, Lo
 
     List<AthleteRoster> findByAthleteIn(List<Athlete> athletes);
 
+    void deleteByAthleteId(Long athleteId);
+
     @Query("SELECT r FROM AthleteRoster r WHERE r.seasonYear = ?1 AND r.college = ?2 AND r.athlete = ?3")
     AthleteRoster findByYearCollegeAndAthlete(Short seasonYear, College college, Athlete athlete);
 
