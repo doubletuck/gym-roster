@@ -21,7 +21,7 @@ import lombok.ToString;
 @Table(name = "athlete_roster", uniqueConstraints = {
         @UniqueConstraint(
                 name = "uk_athlete_roster",
-                columnNames = {"season_year", "college_id", "athlete_id"})
+                columnNames = {"season_year", "athlete_id"})
 })
 public class AthleteRoster extends BaseEntity {
 

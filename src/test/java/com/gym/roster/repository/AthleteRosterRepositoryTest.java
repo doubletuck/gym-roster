@@ -8,6 +8,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -60,6 +61,32 @@ class AthleteRosterRepositoryTest {
         testAthleteRoster.setAthlete(testAthlete);
         testAthleteRoster.setAcademicYear(AcademicYear.SR);
         testAthleteRoster = athleteRosterRepository.save(testAthleteRoster);
+    }
+
+    @Test
+    void testCreate_FailBecauseDuplicateAthleteAndSeasonYear() {
+        College tempCollege = new College();
+        tempCollege.setCodeName("TEMP");
+        tempCollege.setShortName("Temp");
+        tempCollege.setLongName("University of Temporary");
+        tempCollege.setCity("Ashton");
+        tempCollege.setState(State.MD.toString());
+        tempCollege.setConference(Conference.ACC);
+        tempCollege.setDivision(Division.DIV1);
+        tempCollege.setRegion(Region.NE);
+        tempCollege.setNickname("Tempies");
+        tempCollege = collegeRepository.save(tempCollege);
+
+        // When: Inserting an athlete roster when the season year already exist
+        AthleteRoster newAthleteRoster = new AthleteRoster();
+        newAthleteRoster.setAthlete(testAthleteRoster.getAthlete());
+        newAthleteRoster.setSeasonYear(testAthleteRoster.getSeasonYear());
+        newAthleteRoster.setCollege(tempCollege);
+        newAthleteRoster.setAcademicYear(AcademicYear.FIFTH_YR);
+
+        // Then: An error should be thrown because it violates the uniqueness constraint
+        assertThrows(DataIntegrityViolationException.class, () ->
+                athleteRosterRepository.saveAndFlush(newAthleteRoster));
     }
 
     @Test

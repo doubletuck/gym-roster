@@ -52,6 +52,8 @@ After clearing the database, run the migration script(s).
 mvn flyway:migrate -Dspring.profiles.active=local -Dflyway.url=jdbc:postgresql://localhost:5432/gymroster -Dflyway.user=postgres -Dflyway.password=gympass
 ```
 
+NOTE: Whenever new migration scripts are created, run the above command to have them applied to the database.
+
 ## Building
 ```shell
 mvn install 
