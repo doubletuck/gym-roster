@@ -29,7 +29,7 @@ Returns a single coach by ID.
 
 ### GET /coach
 
-Returns a paginated list of coaches.
+Returns a paginated list of coaches, each enriched with their roster history.
 
 **Query Parameters**
 
@@ -37,12 +37,17 @@ Returns a paginated list of coaches.
 |-----------|------|---------|-------------|
 | page | int | 0 | Zero-based page index |
 | size | int | 10 | Number of records per page |
+| q | String | — | Full-text search across `firstName`, `lastName`, and affiliated college names |
+| firstName | String | — | Partial match on first name (case-insensitive) |
+| lastName | String | — | Partial match on last name (case-insensitive) |
+| collegeCodeName | String | — | Exact match on college code name; filters to coaches with a roster entry at that college |
+| seasonYear | Short | — | Filters to coaches with a roster entry in that season year |
 
 **Responses**
 
 | Status | Description |
 |--------|-------------|
-| 200 OK | Paginated result; returns a Spring Data `Page` containing a list of [Coach](#coach-object) objects |
+| 200 OK | Paginated HATEOAS result; returns `PagedModel` containing a list of [CoachResponse](#coachresponse-object) objects |
 
 ---
 
@@ -101,6 +106,8 @@ Deletes a coach by ID.
 
 ## Coach Object
 
+Used as the request/response body for `POST` and `PUT` endpoints.
+
 | Field | Type | Required | Constraints | Description |
 |-------|------|----------|-------------|-------------|
 | id | Long | — | Auto-generated | Unique identifier |
@@ -120,5 +127,53 @@ Deletes a coach by ID.
   "lastName": "Rivera",
   "creationTimestamp": "2024-08-01T12:00:00Z",
   "lastUpdateTimestamp": "2024-08-01T12:00:00Z"
+}
+```
+
+---
+
+## CoachResponse Object
+
+Returned by `GET /coach` and `GET /coach/{id}` (future). Includes the coach's full roster history.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| coachId | Long | Unique identifier |
+| creationTimestamp | Instant | ISO 8601 UTC timestamp of record creation |
+| lastUpdateTimestamp | Instant | ISO 8601 UTC timestamp of last update |
+| firstName | String | Coach's first name |
+| lastName | String | Coach's last name |
+| rosters | List\<CoachRosterEntry\> | All roster entries for this coach |
+
+### CoachRosterEntry
+
+| Field | Type | Description |
+|-------|------|-------------|
+| coachRosterId | Long | Roster entry identifier |
+| collegeCodeName | String | College code name |
+| collegeShortName | String | College short name |
+| collegeLongName | String | College full name |
+| seasonYear | Short | Season year |
+| roleCode | StaffRole | Staff role (e.g. `HEAD_COACH`, `ASSISTANT_COACH`) |
+
+**Example**
+
+```json
+{
+  "coachId": 7,
+  "creationTimestamp": "2024-08-01T12:00:00Z",
+  "lastUpdateTimestamp": "2024-08-01T12:00:00Z",
+  "firstName": "Alex",
+  "lastName": "Rivera",
+  "rosters": [
+    {
+      "coachRosterId": 42,
+      "collegeCodeName": "UCLA",
+      "collegeShortName": "UCLA",
+      "collegeLongName": "University of California, Los Angeles",
+      "seasonYear": 2024,
+      "roleCode": "HEAD_COACH"
+    }
+  ]
 }
 ```

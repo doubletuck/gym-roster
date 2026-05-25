@@ -3,15 +3,20 @@ package com.gym.roster.service;
 import com.gym.roster.domain.Coach;
 import com.gym.roster.domain.CoachRoster;
 import com.gym.roster.domain.College;
+import com.gym.roster.dto.CoachFilterParams;
+import com.gym.roster.dto.CoachResponse;
 import com.gym.roster.repository.CoachRepository;
 import com.gym.roster.repository.CoachRosterRepository;
+import com.gym.roster.specification.CoachSpecification;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class CoachService {
@@ -41,8 +46,14 @@ public class CoachService {
         coachRepository.deleteById(id);
     }
 
-    public Page<Coach> getPaginatedEntities(Pageable pageable) {
-        return coachRepository.findAll(pageable);
+    public Page<CoachResponse> getPaginatedEntities(CoachFilterParams params, Pageable pageable) {
+        Page<Coach> coachPage = coachRepository.findAll(CoachSpecification.build(params), pageable);
+        List<Coach> coaches = coachPage.getContent();
+        Map<Long, List<CoachRoster>> rostersByCoachId = coachRosterRepository.findByCoachIn(coaches)
+                .stream()
+                .collect(Collectors.groupingBy(r -> r.getCoach().getId()));
+        return coachPage.map(
+                coach -> CoachResponse.from(coach, rostersByCoachId.getOrDefault(coach.getId(), List.of())));
     }
 
     public Optional<CoachRoster> findRosterById(Long id) {

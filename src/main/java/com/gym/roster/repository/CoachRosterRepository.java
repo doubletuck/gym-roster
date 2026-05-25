@@ -12,6 +12,8 @@ import java.util.List;
 
 public interface CoachRosterRepository extends JpaRepository<CoachRoster, Long> {
 
+    List<CoachRoster> findByCoachIn(List<Coach> coaches);
+
     @Query("SELECT r FROM CoachRoster r WHERE r.seasonYear = ?1 AND r.college = ?2 AND r.coach = ?3")
     CoachRoster findByYearAndCollegeAndCoach(Short seasonYear, College college, Coach coach);
 

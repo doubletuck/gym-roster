@@ -2,11 +2,12 @@ package com.gym.roster.repository;
 
 import com.gym.roster.domain.Coach;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface CoachRepository extends JpaRepository<Coach, Long> {
+public interface CoachRepository extends JpaRepository<Coach, Long>, JpaSpecificationExecutor<Coach> {
 
     @Query("SELECT c FROM Coach c " +
             "WHERE UPPER(c.firstName) = UPPER(?1) " +
