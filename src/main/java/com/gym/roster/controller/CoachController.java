@@ -37,8 +37,8 @@ public class CoachController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Coach> findById(@PathVariable Long id) {
-        return coachService.findById(id)
+    public ResponseEntity<CoachResponse> findById(@PathVariable Long id) {
+        return coachService.findDtoById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }

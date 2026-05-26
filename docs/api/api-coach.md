@@ -22,7 +22,7 @@ Returns a single coach by ID.
 
 | Status | Description |
 |--------|-------------|
-| 200 OK | Coach found; returns [Coach](#coach-object) |
+| 200 OK | Coach found; returns [CoachResponse](#coachresponse-object) |
 | 404 Not Found | No coach with the given ID |
 
 ---

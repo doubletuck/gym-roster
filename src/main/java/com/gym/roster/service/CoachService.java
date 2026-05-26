@@ -34,6 +34,11 @@ public class CoachService {
         return coachRepository.findById(id);
     }
 
+    public Optional<CoachResponse> findDtoById(Long id) {
+        return coachRepository.findById(id)
+                .map(coach -> CoachResponse.from(coach, coachRosterRepository.findByCoach(coach)));
+    }
+
     public Coach findByName(String firstName, String lastName) {
         return coachRepository.findByName(firstName, lastName);
     }
