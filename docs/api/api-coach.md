@@ -88,7 +88,7 @@ Updates an existing coach. Replaces `firstName` and `lastName`.
 
 ### DELETE /coach/{id}
 
-Deletes a coach by ID.
+Deletes a coach by ID. All roster entries for the coach are also deleted.
 
 **Path Parameters**
 
@@ -100,7 +100,7 @@ Deletes a coach by ID.
 
 | Status | Description |
 |--------|-------------|
-| 204 No Content | Coach deleted |
+| 204 No Content | Coach and associated roster records deleted |
 
 ---
 

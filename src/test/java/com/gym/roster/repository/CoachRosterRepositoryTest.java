@@ -146,6 +146,29 @@ class CoachRosterRepositoryTest {
         assertEquals(2, found.size());
     }
 
+    // --- deleteByCoachId ---
+
+    @Test
+    void testDeleteByCoachId_DeletesAllRostersForCoach() {
+        // Given: Alex has a second roster entry
+        savedRoster(alex, utah, (short) 2025, StaffRole.ASST_COACH);
+
+        // When: Deleting by Alex's ID
+        coachRosterRepository.deleteByCoachId(alex.getId());
+
+        // Then: Both of Alex's rosters are gone
+        assertTrue(coachRosterRepository.findByCoach(alex).isEmpty());
+    }
+
+    @Test
+    void testDeleteByCoachId_DoesNotDeleteRostersForOtherCoaches() {
+        // When: Deleting Alex's rosters
+        coachRosterRepository.deleteByCoachId(alex.getId());
+
+        // Then: Jordan's roster is unaffected
+        assertTrue(coachRosterRepository.existsById(rosterJordanUtah.getId()));
+    }
+
     // --- deleteByYearAndCollegeCodeName ---
 
     @Test
