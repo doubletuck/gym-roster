@@ -1,11 +1,16 @@
 package com.gym.roster.controller;
 
 import com.gym.roster.domain.Coach;
+import com.gym.roster.dto.CoachFilterParams;
+import com.gym.roster.dto.CoachResponse;
 import com.gym.roster.service.CoachService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.data.web.PagedResourcesAssembler;
+import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.PagedModel;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -23,15 +28,17 @@ import org.springframework.web.bind.annotation.RestController;
 public class CoachController {
 
     private final CoachService coachService;
+    private final PagedResourcesAssembler<CoachResponse> pagedResourcesAssembler;
 
     @Autowired
-    public CoachController(CoachService coachService) {
+    public CoachController(CoachService coachService, PagedResourcesAssembler<CoachResponse> pagedResourcesAssembler) {
         this.coachService = coachService;
+        this.pagedResourcesAssembler = pagedResourcesAssembler;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Coach> findById(@PathVariable Long id) {
-        return coachService.findById(id)
+    public ResponseEntity<CoachResponse> findById(@PathVariable Long id) {
+        return coachService.findDtoById(id)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
     }
@@ -60,11 +67,15 @@ public class CoachController {
     }
 
     @GetMapping
-    public ResponseEntity<Page<Coach>> getPaginatedEntities(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        Page<Coach> coaches = coachService.getPaginatedEntities(pageable);
-        return ResponseEntity.ok(coaches);
+    public ResponseEntity<PagedModel<EntityModel<CoachResponse>>> getPaginatedEntities(
+            @PageableDefault(size = 10) Pageable pageable,
+            @RequestParam(required = false) String q,
+            @RequestParam(required = false) String firstName,
+            @RequestParam(required = false) String lastName,
+            @RequestParam(required = false) String collegeCodeName,
+            @RequestParam(required = false) Short seasonYear) {
+        CoachFilterParams filterParams = new CoachFilterParams(q, firstName, lastName, collegeCodeName, seasonYear);
+        Page<CoachResponse> coaches = coachService.getPaginatedEntities(filterParams, pageable);
+        return ResponseEntity.ok(pagedResourcesAssembler.toModel(coaches));
     }
 }
