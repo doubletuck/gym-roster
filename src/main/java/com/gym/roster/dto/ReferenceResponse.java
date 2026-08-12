@@ -1,4 +1,4 @@
 package com.gym.roster.dto;
 
-public record ReferenceResponse(String codeName, String longName) {
+public record ReferenceResponse(String codeName, String shortName, String longName) {
 }
