@@ -1,6 +1,7 @@
 package com.gym.roster.controller;
 
 import com.doubletuck.gym.common.model.StaffRole;
+import com.gym.roster.domain.Conference;
 import com.gym.roster.dto.ReferenceResponse;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,8 +18,17 @@ public class ReferenceController {
     @GetMapping("/staffrole")
     public ResponseEntity<List<ReferenceResponse>> getStaffRoles() {
         List<ReferenceResponse> roles = Arrays.stream(StaffRole.values())
-                .map(role -> new ReferenceResponse(role.name(), role.getLongName()))
+                .map(role -> new ReferenceResponse(role.name(), role.name(), role.getLongName()))
                 .toList();
         return ResponseEntity.ok(roles);
     }
+
+    @GetMapping("/conference")
+    public ResponseEntity<List<ReferenceResponse>> getConferences() {
+        List<ReferenceResponse> conferences = Arrays.stream(Conference.values())
+                .map(conference -> new ReferenceResponse(conference.name(), conference.getShortName(), conference.getLongName()))
+                .toList();
+        return ResponseEntity.ok(conferences);
+    }
+
 }
