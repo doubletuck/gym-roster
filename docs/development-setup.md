@@ -15,7 +15,7 @@ This document provides information for a developer to get their local developmen
 
 ## Required Software
 * Homebrew - A package manager for installing software libraries and packages.
-* Java 21 - The programming language used to develop this service.
+* Java 25 - The programming language used to develop this service.
 * Maven 3.9.x - The build tool used for this Java service.
 * Docker
 * Postgres
@@ -26,65 +26,51 @@ Homebrew is a package manager for macOS. Go to the [Homebrew](https://brew.sh/) 
 
 ## Install Java
 
-### 1. Check the JDK version
-Java is the programmatic language used to create this service and it is likely that your OS will already have Java installed.
+### 1. Install JDK using Homebrew
+To install Java 25, run the following command in your terminal:
 
-To check which version of Java is installed, run:
 ```shell
-java --version
+brew install openjdk@25
 ```
 
-Example return:
-```text
-% java --version
-openjdk 17.0.1 2021-10-19
-OpenJDK Runtime Environment (build 17.0.1+12-39)
-OpenJDK 64-Bit Server VM (build 17.0.1+12-39, mixed mode, sharing)
-```
+Brew will not overwrite an existing JDK installation, nor will it make this installation the default on your `PATH`. That's fine — this project does not rely on `JAVA_HOME` or a system-default `java`. Instead it pins its own build to a specific JDK using a [Maven toolchain](https://maven.apache.org/guides/mini/guide-using-toolchains.html), configured next. This means you can have other JDK versions installed and set as your shell default without affecting this project's build.
 
-If you already have Java 21 installed, then you can skip this section.
-
-### 2. Install JDK using Homebrew
-If your version is not Java 21 or greater or if you don't have Java installed, then run:
+### 2. Register the JDK in a Maven toolchain
+Find the path to the JDK you just installed:
 ```shell
-brew install openjdk@21
+brew --prefix openjdk@25
+```
+This will print something like `/opt/homebrew/opt/openjdk@25` (Apple Silicon) or `/usr/local/opt/openjdk@25` (Intel).
+
+If you don't already have a `~/.m2/toolchains.xml` file, create one. Add a `<toolchain>` entry for JDK 25, using the path from above appended with `/libexec/openjdk.jdk/Contents/Home`. Below shows the contents of an example `toolchains.xml`:
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<toolchains xmlns="http://maven.apache.org/TOOLCHAINS/1.1.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://maven.apache.org/TOOLCHAINS/1.1.0 https://maven.apache.org/xsd/toolchains-1.1.0.xsd">
+    <toolchain>
+        <type>jdk</type>
+        <provides>
+            <version>25</version>
+        </provides>
+        <configuration>
+            <jdkHome>/opt/homebrew/opt/openjdk@25/libexec/openjdk.jdk/Contents/Home</jdkHome>
+        </configuration>
+    </toolchain>
+</toolchains>
 ```
 
-### 3. Set JAVA_HOME in your shell
-Brew will not overwrite the existing JDK installation, nor will it make this installation the default. To use the newly installed version of JDK, set the `JAVA_HOME` variable in the `.zshrc`.
+If you already have other `<toolchain>` entries in that file, then just add the toolchain block for JDK 25 alongside them.
 
-Add the following to the `~/.zshrc` file:
-```text
-export JAVA_HOME="/usr/local/opt/openjdk@21"
-export PATH="$JAVA_HOME/bin:$PATH"
-```
-
-### 4. Reload the configuration
-Reload the shell so that the environment variables are loaded into your current shell.
+### 3. Confirm the configuration
+From the project root, run a build:
 ```shell
-source ~/.zshrc
+mvn clean install
 ```
+You should see `BUILD SUCCESS`. If the toolchain isn't found, Maven will fail fast with a "Cannot find matching toolchain" error rather than silently falling back to whatever JDK is on your `PATH`.
 
-### 5. Confirm the configuration
-**Confirm the `JAVA_HOME` environment variable:**
-```shell
-echo $JAVA_HOME
-```
-The output should be:
-```text
-/usr/local/opt/openjdk@21
-```
-
-**Confirm that the java version:**
-```shell
-java -version
-```
-The output should be similar to:
-```text
-openjdk version "21.0.5" 2024-10-15
-OpenJDK Runtime Environment Homebrew (build 21.0.5)
-OpenJDK 64-Bit Server VM Homebrew (build 21.0.5, mixed mode, sharing)
-```
+### A note on Lombok and JDK 25
+This project's `pom.xml` sets `<proc>full</proc>` on `maven-compiler-plugin`. This works around a [known upstream Lombok bug](https://github.com/projectlombok/lombok/issues/3846): on JDK 23+, `javac`'s default annotation-processing mode silently drops the getters/setters/etc. that Lombok generates, without any error. If you ever see a wall of "cannot find symbol: method getX()/setX()" errors referencing classes annotated with `@Getter`/`@Setter`/`@Data`, check that this setting is still in place before assuming something else is wrong.
 
 ## Install Maven
 
@@ -99,25 +85,38 @@ Docker allows for the creation, packaging and execution of a managed environment
 
 ### 1. Download the PostgreSQL image
 ```shell
-docker pull postgres:17-alpine
+docker pull postgres:18-alpine
 ```
 
 ### 2. Create and start a container from the PostgreSQL image
 ```shell
-docker run --name gym-roster-postgres -p 5432:5432 -e POSTGRES_PASSWORD=gympass -d postgres:17-alpine 
+docker run --name gym-roster-postgres -p 5432:5432 \
+  -e POSTGRES_USER=postgres \
+  -e POSTGRES_PASSWORD=gympass \
+  -e POSTGRES_DB=gymroster \
+  -v gym-roster-data:/var/lib/postgresql \
+  -d postgres:18-alpine
 ```
 Where:
 * `docker run`
    * The docker command used to run a container based on an image.
 * `--name gym-roster-postgres`
    * Assigns the name "gym-roster-postgres" to the container that's being created from the `run` command.
+* `-e POSTGRES_USER=postgres`
+   * The `-e` flag sets an environment variable inside the container.
+   * The superuser. Note, the absence of this environment variable will default to a superuser name called `postgres`.
 * `-e POSTGRES_PASSWORD=gympass`
-   * The `-e` flag sets an environment variable inside the container. `POSTGRES_PASSWORD` is required by image.
-   * The Postgres server will use this password for the user account called `postgres`.
+   * The Postgres server will use this password for the superuser in `POSTGRES_USER`.
+* `-e POSTGRES_DB=gymroster`
+   * The database that will be created on startup and owned by the superuser.
+* `-v gym-roster-data:/var/lib/postgresql/data`
+   * Maps a Docker-managed volume named `gym-roster-data`to the director inside the container where Postgres actually stores its files. If the container is removed, the volume with your data will remain and can be reattached.
 * `-d`
    * The `-d` flag tells docker to run the container in detached mode which means it will run in the background. 
-* `postgres:17-alpine`
+* `postgres:18-alpine`
    * The image that docker will use to create the container. The image is pulled from Docker Hub if it's not already available locally. 
+
+Note, the absence of `POSTGRES_USER=<username>` means that the superuser name will default to `postgres`.
 
 ## Install psql
 Psql is a command line client tool for querying the PostgreSQL database and is an optional step as there are many tools for interfacing with the database.
@@ -137,15 +136,6 @@ To connect to psql, run the command below. You will be prompted for your passwor
 psql -h localhost -p 5432 -U postgres
 ```
 
-## Create database
-
-First, connect to the PostgreSQL instance that was created (for example, using the psql instructions above).
-
-Run the `create database <database-name>` command.
-```text
-create database gymroster;
-```
-
 ## Setup GitHub personal access token
 
 This project uses the [gym-common](https://github.com/doubletuck/gym-common) library which is hosted as a GitHub package. This project's [pom.xml](../pom.xml) has a repository setting that refers to the this package repository. Because GitHub packages require authentication to access the artifacts, you will need to have a token that allows your account to access packages. This will be needed for fetching libraries locally as well as running workflow actions used by this project.
@@ -153,9 +143,9 @@ This project uses the [gym-common](https://github.com/doubletuck/gym-common) lib
 #### Generate GitHub token
 
 1. Go to `Settings` in your GitHub developer account
-1. Click the `Developer settings` menu option
-1. Click the `Personal access tokens` menu option and select the `Tokens (classic)` option
-1. Click on the `Generate new token (classic)` button to view the create page
+1. Click the `Credentials` menu option
+1. Click the `Personal access tokens (classix)` menu option
+1. Click on the `Generate new token` button to view the create page
 1. The values below are guidelines, but do not have to what is provided **except** for the `Select scopes`:
    - **Note**: `Package registry reader token`
    - **Expiration**: No expiration
