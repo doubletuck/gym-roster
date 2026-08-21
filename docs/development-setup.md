@@ -33,14 +33,14 @@ To install Java 25, run the following command in your terminal:
 brew install openjdk@25
 ```
 
-Brew will not overwrite an existing JDK installation, nor will it make this installation the default on your `PATH`. That's fine — this project does not rely on `JAVA_HOME` or a system-default `java`. Instead it pins its own build to a specific JDK using a [Maven toolchain](https://maven.apache.org/guides/mini/guide-using-toolchains.html), configured next. This means you can have other JDK versions installed and set as your shell default without affecting this project's build.
+Brew will not overwrite an existing JDK installation, nor will it make this installation the default on your `PATH`. This project does not rely on `JAVA_HOME` or a system-default `java`. Instead it pins its own build to a specific JDK using a [Maven toolchain](https://maven.apache.org/guides/mini/guide-using-toolchains.html), configured next. This means you can have other JDK versions installed and set as your shell default without affecting this project's build.
 
 ### 2. Register the JDK in a Maven toolchain
 Find the path to the JDK you just installed:
 ```shell
 brew --prefix openjdk@25
 ```
-This will print something like `/opt/homebrew/opt/openjdk@25` (Apple Silicon) or `/usr/local/opt/openjdk@25` (Intel).
+This will print something like `/opt/homebrew/opt/openjdk@25`.
 
 If you don't already have a `~/.m2/toolchains.xml` file, create one. Add a `<toolchain>` entry for JDK 25, using the path from above appended with `/libexec/openjdk.jdk/Contents/Home`. Below shows the contents of an example `toolchains.xml`:
 ```xml
