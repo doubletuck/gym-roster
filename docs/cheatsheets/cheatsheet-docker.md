@@ -37,11 +37,21 @@ docker stop a11df8b6959f
 ## Remove a container
 First, stop the container.
 
-```text
-docker container rm <container-id>
+```shell
+docker container rm <container_id>
 ```
 
 ## Remove an image
 ```text
-docker image rm <image-id>
+docker image rm <image_id>
+```
+
+## List volumes
+```shell
+docker volume ls
+```
+
+## Remove volume
+```shell
+docker volume rm <volume_name>
 ```
