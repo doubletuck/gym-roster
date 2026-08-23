@@ -11,6 +11,8 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
@@ -310,6 +312,69 @@ class AthleteRosterRepositoryTest {
         assertNotNull(found2026, "Should find 2026 roster");
         assertEquals((short) 2026, found2026.getSeasonYear());
         assertNotEquals(found2025.getId(), found2026.getId());
+    }
+
+    // --- findByYearAndCollegeCodeName ---
+
+    @Test
+    void testFindByYearAndCollegeCodeName_ExactMatch() {
+        // When: Querying with exact year and college code
+        List<AthleteRoster> found = athleteRosterRepository.findByYearAndCollegeCodeName((short) 2025, "UCLA");
+
+        // Then: Emily's roster is found
+        assertEquals(1, found.size());
+        assertEquals(testAthleteRoster.getId(), found.get(0).getId());
+    }
+
+    @Test
+    void testFindByYearAndCollegeCodeName_CaseInsensitive() {
+        // When: Querying with lowercase college code
+        List<AthleteRoster> found = athleteRosterRepository.findByYearAndCollegeCodeName((short) 2025, "ucla");
+
+        // Then: Emily's roster is still found
+        assertEquals(1, found.size());
+        assertEquals(testAthleteRoster.getId(), found.get(0).getId());
+    }
+
+    @Test
+    void testFindByYearAndCollegeCodeName_WrongYear_ReturnsEmpty() {
+        // When: Querying with a year that has no rosters for that college
+        List<AthleteRoster> found = athleteRosterRepository.findByYearAndCollegeCodeName((short) 2024, "UCLA");
+
+        // Then: No results
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
+    void testFindByYearAndCollegeCodeName_WrongCollege_ReturnsEmpty() {
+        // When: Querying with correct year but a college with no rosters
+        List<AthleteRoster> found = athleteRosterRepository.findByYearAndCollegeCodeName((short) 2025, "UTAH");
+
+        // Then: No results
+        assertTrue(found.isEmpty());
+    }
+
+    @Test
+    void testFindByYearAndCollegeCodeName_MultipleAthletesAtSameCollegeAndYear() {
+        // Given: A second athlete with a roster at the same college and year
+        Athlete secondAthlete = new Athlete();
+        secondAthlete.setFirstName("Sarah");
+        secondAthlete.setLastName("Johnson");
+        secondAthlete.setHomeCity("San Francisco");
+        secondAthlete = athleteRepository.save(secondAthlete);
+
+        AthleteRoster secondRoster = new AthleteRoster();
+        secondRoster.setSeasonYear((short) 2025);
+        secondRoster.setCollege(testCollege);
+        secondRoster.setAthlete(secondAthlete);
+        secondRoster.setAcademicYear(AcademicYear.SO);
+        athleteRosterRepository.save(secondRoster);
+
+        // When: Querying for that year/college
+        List<AthleteRoster> found = athleteRosterRepository.findByYearAndCollegeCodeName((short) 2025, "UCLA");
+
+        // Then: Both rosters are returned
+        assertEquals(2, found.size());
     }
 
 }
