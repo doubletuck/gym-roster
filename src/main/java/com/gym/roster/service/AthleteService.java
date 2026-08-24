@@ -17,6 +17,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -112,6 +113,12 @@ public class AthleteService {
 
     public AthleteRoster findRosterByYearCollegeAndAthlete(Short seasonYear, College college, Athlete athlete) {
         return athleteRosterRepository.findByYearCollegeAndAthlete(seasonYear, college, athlete);
+    }
+
+    public List<AthleteRoster> findRosterByYearAndCollegeCode(Short seasonYear, String collegeCodeName) {
+        List<AthleteRoster> rosters = athleteRosterRepository.findByYearAndCollegeCodeName(seasonYear, collegeCodeName);
+        rosters.sort(Comparator.comparing(r -> r.getAthlete().getLastName(), String.CASE_INSENSITIVE_ORDER));
+        return rosters;
     }
 
     public AthleteRoster findRosterByYearCollegeNameAndAthleteName(

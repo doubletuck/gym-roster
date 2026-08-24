@@ -1,8 +1,32 @@
 # Roster API
 
-Base paths: `/roster/athlete`, `/roster/coach`
+Base path: `/roster`
 
 Manages team rosters for a given season. An athlete roster entry places an athlete on a college team for a specific season year. A coach roster entry places a coach on a college staff for a specific season year.
+
+---
+
+## Combined Roster Endpoint
+
+### GET /roster/{seasonYear}/{collegeCodeName}
+
+Returns a college's full team roster (athletes and coaches together) for a given season.
+
+**Path Parameters**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| seasonYear | Short | Four-digit season year (e.g. `2024`) |
+| collegeCodeName | String | College code name (e.g. `UCLA`) |
+
+**Responses**
+
+| Status | Description |
+|--------|-------------|
+| 200 OK | Returns [CollegeRosterResponse](#collegerosterresponse-object); `athletes`/`coaches` are empty lists if none found |
+| 404 Not Found | No college with the given code name |
+
+`athletes` is sorted by athlete last name. `coaches` is sorted by coach last name for now — a future revision will sort coaches by staff role hierarchy (head coach first, etc.).
 
 ---
 
@@ -50,6 +74,25 @@ Deletes an athlete roster entry by ID.
 
 ---
 
+### GET /roster/athlete/{seasonYear}/{collegeCodeName}
+
+Returns all athlete roster entries for a college in a given season, sorted by athlete last name.
+
+**Path Parameters**
+
+| Parameter | Type | Description |
+|-----------|------|-------------|
+| seasonYear | Short | Four-digit season year (e.g. `2024`) |
+| collegeCodeName | String | College code name (e.g. `UCLA`) |
+
+**Responses**
+
+| Status | Description |
+|--------|-------------|
+| 200 OK | Returns a list of [AthleteRoster](#athleteroster-object) objects (empty list if none found) |
+
+---
+
 ### POST /roster/athlete/file-import
 
 Imports athlete roster entries from an uploaded file. Creates athlete and roster records that do not already exist.
@@ -92,13 +135,22 @@ Imports athlete roster entries from all eligible files in a server-side director
 
 Creates a new coach roster entry.
 
-**Request Body** — [CoachRoster](#coachroster-object) (JSON)
+**Request Body** — `CoachRosterRequest` (JSON)
+
+| Field | Type | Required | Constraints | Description |
+|-------|------|----------|-------------|-------------|
+| collegeId | Long | Yes | Must reference an existing college | ID of the college |
+| coachId | Long | Yes | Must reference an existing coach | ID of the coach |
+| seasonYear | Short | Yes | — | Four-digit season year (e.g. `2024`) |
+| roleCode | String | Yes | StaffRole enum code | The coach's staff role (e.g. `HEAD_COACH`, `ASST_COACH`) |
 
 **Responses**
 
 | Status | Description |
 |--------|-------------|
-| 200 OK | Roster entry created; returns the new [CoachRoster](#coachroster-object) |
+| 201 Created | Roster entry created; returns the new [CoachRoster](#coachroster-object) |
+| 404 Not Found | No college or coach found for the given ID |
+| 400 Bad Request | Validation error on the request body |
 
 ---
 
@@ -123,7 +175,7 @@ Returns a single coach roster entry by ID.
 
 ### GET /roster/coach/{seasonYear}/{collegeCodeName}
 
-Returns all coach roster entries for a college in a given season.
+Returns all coach roster entries for a college in a given season, sorted by coach last name for now (subject to change to a staff-role hierarchy sort).
 
 **Path Parameters**
 
@@ -216,6 +268,61 @@ Imports coach roster entries from all eligible files in a server-side directory.
 ---
 
 ## Data Objects
+
+### CollegeRosterResponse Object
+
+Returned by `GET /roster/{seasonYear}/{collegeCodeName}`.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| collegeId | Long | The college's ID |
+| collegeCodeName | String | The college's code name |
+| collegeShortName | String | The college's short display name |
+| collegeLongName | String | The college's full institutional name |
+| seasonYear | Short | Four-digit season year (e.g. `2024`) |
+| athletes | List\<AthleteEntry\> | The college's athletes for the season, sorted by last name |
+| coaches | List\<CoachEntry\> | The college's coaching staff for the season, sorted by last name |
+
+**AthleteEntry**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| athleteRosterId | Long | The underlying AthleteRoster entry's ID |
+| athleteId | Long | The athlete's ID |
+| firstName | String | Athlete's first name |
+| lastName | String | Athlete's last name |
+| academicYear | String | Academic year enum code (e.g. `FRESHMAN`, `SOPHOMORE`, `JUNIOR`, `SENIOR`) |
+| events | String | Event codes the athlete competes in (e.g. `VAULT`, `BARS`) |
+
+**CoachEntry**
+
+| Field | Type | Description |
+|-------|------|-------------|
+| coachRosterId | Long | The underlying CoachRoster entry's ID |
+| coachId | Long | The coach's ID |
+| firstName | String | Coach's first name |
+| lastName | String | Coach's last name |
+| roleCode | String | StaffRole enum code (e.g. `HEAD_COACH`, `ASST_COACH`) |
+
+**Example**
+
+```json
+{
+  "collegeId": 1,
+  "collegeCodeName": "UCLA",
+  "collegeShortName": "UCLA",
+  "collegeLongName": "University of California, Los Angeles",
+  "seasonYear": 2024,
+  "athletes": [
+    { "athleteRosterId": 201, "athleteId": 101, "firstName": "Emily", "lastName": "Lee", "academicYear": "JR", "events": "VAULT" }
+  ],
+  "coaches": [
+    { "coachRosterId": 202, "coachId": 102, "firstName": "Alex", "lastName": "Rivera", "roleCode": "HEAD_COACH" }
+  ]
+}
+```
+
+---
 
 ### AthleteRoster Object
 

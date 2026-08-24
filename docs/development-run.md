@@ -72,8 +72,10 @@ This will:
 The `local` application properties profile, [application-local.yml](../src/main/resources/application-local.yml), defaults to local development environment values. If you followed the development setup guide, then the configuration will work as is. If you modified your setup (i.e., changed the database name or password), then you will need to adjust the properties values appropriately.
 
 ```shell
-mvn spring-boot:run -Dspring.profiles.active=local
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 ```
+
+`spring-boot.run.profiles` is the `spring-boot-maven-plugin`'s own parameter for this; the `run` goal forks a separate JVM, so a plain `-Dspring.profiles.active=local` on the `mvn` command line only sets that property on the Maven process itself and never reaches the forked app.
 
 or 
 

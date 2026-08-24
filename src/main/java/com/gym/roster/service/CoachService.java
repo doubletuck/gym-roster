@@ -1,10 +1,12 @@
 package com.gym.roster.service;
 
+import com.doubletuck.gym.common.model.StaffRole;
 import com.gym.roster.domain.Coach;
 import com.gym.roster.domain.CoachRoster;
 import com.gym.roster.domain.College;
 import com.gym.roster.dto.CoachFilterParams;
 import com.gym.roster.dto.CoachResponse;
+import com.gym.roster.dto.CoachRosterRequest;
 import com.gym.roster.repository.CoachRepository;
 import com.gym.roster.repository.CoachRosterRepository;
 import com.gym.roster.specification.CoachSpecification;
@@ -14,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -24,11 +27,14 @@ public class CoachService {
 
     private final CoachRepository coachRepository;
     private final CoachRosterRepository coachRosterRepository;
+    private final CollegeService collegeService;
 
     @Autowired
-    public CoachService(CoachRepository coachRepository, CoachRosterRepository coachRosterRepository) {
+    public CoachService(CoachRepository coachRepository, CoachRosterRepository coachRosterRepository,
+            CollegeService collegeService) {
         this.coachRepository = coachRepository;
         this.coachRosterRepository = coachRosterRepository;
+        this.collegeService = collegeService;
     }
 
     public Optional<Coach> findById(Long id) {
@@ -72,8 +78,28 @@ public class CoachService {
         return coachRosterRepository.findByYearAndCollegeAndCoach(seasonYear, college, coach);
     }
 
+    public Optional<CoachRoster> createRoster(CoachRosterRequest request) {
+        Optional<College> college = collegeService.findById(request.collegeId());
+        if (college.isEmpty()) {
+            return Optional.empty();
+        }
+        Optional<Coach> coach = coachRepository.findById(request.coachId());
+        if (coach.isEmpty()) {
+            return Optional.empty();
+        }
+        CoachRoster roster = new CoachRoster();
+        roster.setCollege(college.get());
+        roster.setCoach(coach.get());
+        roster.setSeasonYear(request.seasonYear());
+        roster.setRoleCode(StaffRole.find(request.roleCode()));
+        return Optional.of(coachRosterRepository.save(roster));
+    }
+
     public List<CoachRoster> findRosterByYearAndCollegeCode(Short seasonYear, String collegeCodeName) {
-        return coachRosterRepository.findByYearAndCollegeCodeName(seasonYear, collegeCodeName);
+        List<CoachRoster> rosters = coachRosterRepository.findByYearAndCollegeCodeName(seasonYear, collegeCodeName);
+        // TODO: sort by StaffRole hierarchy (head coach first, etc.) once that ordering is embedded in the enum
+        rosters.sort(Comparator.comparing(r -> r.getCoach().getLastName(), String.CASE_INSENSITIVE_ORDER));
+        return rosters;
     }
 
     public CoachRoster save(CoachRoster roster) {

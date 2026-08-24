@@ -21,6 +21,9 @@ public interface AthleteRosterRepository extends JpaRepository<AthleteRoster, Lo
     @Query("SELECT r FROM AthleteRoster r WHERE r.seasonYear = ?1 AND r.college = ?2 AND r.athlete = ?3")
     AthleteRoster findByYearCollegeAndAthlete(Short seasonYear, College college, Athlete athlete);
 
+    @Query("SELECT r FROM AthleteRoster r WHERE r.seasonYear = ?1 AND UPPER(r.college.codeName) = UPPER(?2)")
+    List<AthleteRoster> findByYearAndCollegeCodeName(Short seasonYear, String collegeCodeName);
+
     @Query("SELECT r FROM AthleteRoster r " +
             "WHERE r.seasonYear = ?1 " +
             "AND (LOWER(r.college.codeName) = LOWER(?2) OR LOWER(r.college.shortName) = LOWER(?2)) " +

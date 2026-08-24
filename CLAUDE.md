@@ -15,7 +15,7 @@ mvn verify
 mvn test -Dtest=CollegeRepositoryTest
 
 # Run locally
-mvn spring-boot:run -Dspring.profiles.active=local
+mvn spring-boot:run -Dspring-boot.run.profiles=local
 # or after building:
 java -jar target/gym-roster.jar --spring.profiles.active=local
 
